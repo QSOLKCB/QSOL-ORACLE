@@ -1,0 +1,49 @@
+{
+  "type": "qsol-oracle-manifest",
+  "protocol": "QSOL-ORACLE/1",
+  "schema_version": "1.0.0",
+  "snapshot_date": "2026-08-18",
+  "role": "witness-attestation-routing-temporal-contract-layer",
+  "semantic_authority": "none-by-default",
+  "reasoning_authority": "none",
+  "ledger_model": "single-writer-append-only",
+  "entrypoint": "README4AI.md",
+  "constitution": "ai/constitution.json",
+  "nexus_boundary": "ai/nexus-boundary.json",
+  "ledger": "ledger/events.jsonl",
+  "event_schema": "schema/oracle-event.schema.json",
+  "founding_timelock": "contracts/qsol-context-2056.json",
+  "validation_command": "python3 tools/oracle.py validate",
+  "test_command": "python3 -W default -m unittest discover -s tests -v",
+  "roles": {
+    "QSOL-SUBSTRATE": "KNOWS",
+    "QSOL-ARK": "SURVIVES",
+    "QSOL-INT": "COMPOSES",
+    "QSOL-ORACLE": "WITNESSES",
+    "QSOL-NEXUS": "REASONS"
+  },
+  "response_states": ["known", "conflict", "unknown"],
+  "provenance_kinds": [
+    "primary_observation",
+    "derived_statement",
+    "correction",
+    "metadata"
+  ],
+  "files": [
+    "README.md",
+    "README4AI.md",
+    "AGENTS.md",
+    "ROADMAP.md",
+    "ai/constitution.json",
+    "ai/nexus-boundary.json",
+    "contracts/qsol-context-2056.json",
+    "docs/ARCHITECTURE.md",
+    "docs/NEXUS.md",
+    "docs/TIMELOCK.md",
+    "ledger/events.jsonl",
+    "schema/oracle-event.schema.json",
+    "tools/oracle.py",
+    "tests/test_oracle.py",
+    ".github/workflows/validate.yml"
+  ]
+}

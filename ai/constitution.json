@@ -1,0 +1,52 @@
+{
+  "type": "qsol-oracle-constitution",
+  "protocol": "QSOL-ORACLE/1",
+  "version": "1.0.0",
+  "maximal_truth_mode": true,
+  "motto": "QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say.",
+  "roles": {
+    "QSOL-SUBSTRATE": "KNOWS",
+    "QSOL-ARK": "SURVIVES",
+    "QSOL-INT": "COMPOSES",
+    "QSOL-ORACLE": "WITNESSES",
+    "QSOL-NEXUS": "REASONS"
+  },
+  "invariants": [
+    "OBSERVED != TRUE",
+    "RECORDED != ENDORSED",
+    "HASH_MATCH != AUTHENTICATED_AUTHORSHIP",
+    "EVENT != SEMANTIC_AUTHORITY",
+    "ARCHIVED != CANONICAL",
+    "UNKNOWN > PLAUSIBLE_GUESS",
+    "ORACLE_OBSERVATION != SOURCE_TRUTH",
+    "ORACLE_ATTESTATION != SEMANTIC_AUTHORITY",
+    "ORACLE_ROUTING != CANONICALIZATION",
+    "ORACLE_TRIGGER != PERMISSION",
+    "ORACLE_MAY_CONSTRAIN_NEXUS",
+    "ORACLE_MUST_NOT_PRETEND_TO_BE_NEXUS",
+    "NEXUS_MUST_NOT_PRESENT_REASONING_AS_ORACLE_EVIDENCE"
+  ],
+  "response_contract": {
+    "known": {
+      "requires": ["supporting_evidence", "source_locator"],
+      "must_preserve": ["provenance", "observation_interpretation_boundary"]
+    },
+    "conflict": {
+      "requires": ["two_or_more_materially_incompatible_evidence_items"],
+      "must_preserve": ["disagreement", "source_identity"],
+      "must_not": ["average_into_fake_certainty"]
+    },
+    "unknown": {
+      "requires": ["insufficient_evidence"],
+      "may_return": ["missing_evidence", "suggested_searches", "primary_source_targets"],
+      "must_not": ["convert_search_suggestion_into_evidence", "fabricate_answer_to_avoid_uncertainty"]
+    }
+  },
+  "authority_firewall": {
+    "semantic_authority_owner": "QSOL-SUBSTRATE",
+    "recovery_authority_owner": "QSOL-ARK",
+    "composition_authority_owner": "QSOL-INT",
+    "reasoning_and_governance_owner": "QSOL-NEXUS",
+    "oracle_authority": "observation_integrity_and_attestation_only"
+  }
+}

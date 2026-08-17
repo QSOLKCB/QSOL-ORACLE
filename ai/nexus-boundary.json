@@ -1,0 +1,51 @@
+{
+  "type": "qsol-oracle-nexus-boundary",
+  "protocol": "QSOL-ORACLE/1",
+  "version": "1.0.0",
+  "relationship": "evidentiary-membrane",
+  "oracle_role": "WITNESSES",
+  "nexus_role": "REASONS",
+  "allowed_oracle_to_nexus": [
+    "witness_events",
+    "source_locators",
+    "hashes_and_receipts",
+    "freshness_state",
+    "conflict_state",
+    "unknown_state",
+    "missing_evidence",
+    "suggested_searches"
+  ],
+  "allowed_nexus_to_oracle": [
+    "evidence_queries",
+    "visible_claims_for_audit",
+    "explicit_citations",
+    "public_receipts",
+    "public_action_events"
+  ],
+  "forbidden": [
+    "oracle_vote_authority",
+    "oracle_council_seat",
+    "oracle_worldstore_mutation_authority",
+    "oracle_governance_authority",
+    "nexus_reasoning_relabelled_as_oracle_evidence",
+    "hidden_chain_of_thought_capture",
+    "hidden_chain_of_thought_reconstruction"
+  ],
+  "stenographer_bridge": {
+    "purpose": "QSOL-NEXUS Courtroom Stenographer may present or mirror ORACLE witness records.",
+    "authority": "presentation-only",
+    "rule": "A Stenographer rendering is not a new ORACLE observation unless separately witnessed and recorded.",
+    "failure_semantics": "fail-passive; preserve completeness gaps rather than rewriting the original result"
+  },
+  "output_audit": {
+    "scope": "visible-claim-boundary-only",
+    "may_check": [
+      "citation_support",
+      "claim_exceeds_evidence",
+      "inference_presented_as_fact",
+      "conflict_suppressed",
+      "unknown_suppressed"
+    ],
+    "must_not_claim": "access to private model reasoning"
+  }
+}

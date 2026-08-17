@@ -1,0 +1,42 @@
+{
+  "protocol": "QSOL-TIMELOCK/1",
+  "contract_id": "qsol-context-publication-2056",
+  "subject": "QSOLKCB/QSOL-CONTEXT",
+  "created_at": "2026-08-18T06:18:00+09:30",
+  "not_before": "2056-08-18T00:00:00+09:30",
+  "intent": {
+    "current_visibility": "private",
+    "target_visibility": "public",
+    "release_mode": "repository_visibility_transition"
+  },
+  "authority": {
+    "kind": "explicit_maintainer_directive",
+    "maintainer": "Trent Slade / QSOL-IMC",
+    "revocation_policy": "a newer explicitly authenticated maintainer directive may supersede this contract before execution"
+  },
+  "states": ["locked", "eligible", "blocked", "executed"],
+  "preconditions": [
+    "deadline_reached",
+    "source_repository_resolved",
+    "publication_clearance_receipt_valid",
+    "no_unclassified_material",
+    "no_permanent_deny_material",
+    "executor_has_current_platform_authority"
+  ],
+  "fail_closed": true,
+  "credential_policy": {
+    "store_long_lived_credentials": false,
+    "reason": "A 30-year credential is not a plan; it is a future incident report."
+  },
+  "oracle_semantics": {
+    "before_deadline": "locked",
+    "after_deadline": "eligible",
+    "eligibility_is_execution": false,
+    "eligibility_is_permission_to_ignore_safety_gates": false
+  },
+  "platform_binding": {
+    "preferred_current_platform": "github",
+    "platform_is_semantic_authority": false,
+    "executor_is_replaceable": true
+  }
+}

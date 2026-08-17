@@ -12,6 +12,7 @@
     "subject",
     "observed_at",
     "source",
+    "provenance_kind",
     "evidence",
     "authority",
     "previous_hash",
@@ -33,6 +34,15 @@
         "kind": {"type": "string", "minLength": 1},
         "locator": {"type": "string", "minLength": 1}
       }
+    },
+    "provenance_kind": {
+      "enum": ["primary_observation", "derived_statement", "correction", "metadata"]
+    },
+    "derived_from": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
     },
     "evidence": {
       "type": "object",
@@ -57,5 +67,15 @@
     },
     "note": {"type": "string"},
     "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provenance_kind": {"enum": ["derived_statement", "correction"]}
+        }
+      },
+      "then": {"required": ["derived_from"]}
+    }
+  ]
 }

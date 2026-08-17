@@ -10,6 +10,7 @@ role: witness / attestation / routing / temporal-contract layer
 semantic_authority: none by default
 reasoning_authority: none
 control_authority_over_nexus: none
+ledger_model: single-writer-append-only
 ```
 
 ## Required interpretation
@@ -42,9 +43,39 @@ For `unknown`, preserve uncertainty and return bounded `suggested_searches` or p
 
 ## Ledger
 
-`ledger/events.jsonl` is append-only and hash-linked. `event_hash` is SHA-256 of canonical JSON for the record with `event_hash` omitted, using UTF-8, sorted keys, and compact separators.
+`ledger/events.jsonl` is a **single-writer append-only** hash-linked ledger. File order is canonical order and `sequence` equals the zero-based file position.
 
-A valid chain establishes deterministic ledger integrity only. It does not establish semantic truth.
+`event_hash` is SHA-256 of canonical JSON for the record with `event_hash` omitted, using UTF-8, sorted keys, and compact separators.
+
+Every event declares one `provenance_kind`:
+
+```text
+primary_observation
+derived_statement
+correction
+metadata
+```
+
+`derived_statement` and `correction` must contain `derived_from` references to earlier canonical `event_hash` values. A NEXUS answer, summary, transformation, or search suggestion cannot be upgraded to `primary_observation` merely because ORACLE received it.
+
+A valid chain establishes deterministic ledger integrity only. It does not establish semantic truth, authorship, endorsement, or scientific validity.
+
+## Minimal event workflow
+
+When appending an event:
+
+```text
+1. source.locator = direct evidence location
+2. provenance_kind = correct evidence class
+3. derived_from = prior event hashes when derived/corrective
+4. sequence = next canonical file position
+5. previous_hash = current ledger head
+6. event_hash = SHA256(canonical event without event_hash)
+7. append one JSON object as one JSONL line
+8. run tools/oracle.py validate
+```
+
+Do not accept an event merely because it can be hashed. Hashing nonsense produces extremely reproducible nonsense.
 
 ## Temporal contract
 

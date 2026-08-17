@@ -29,15 +29,44 @@ Do not reward rhetorical confidence. Do not fabricate a complete answer to avoid
 
 ## Ledger rules
 
-`ledger/events.jsonl` is append-only. Existing event bytes must not be silently rewritten to make history look cleaner. Corrections are new events that reference prior records.
+`ledger/events.jsonl` is a **single-writer, append-only canonical ledger**. File order is canonical order, and `sequence` must equal zero-based file position. Do not merge independently numbered fragments into this file and hope SHA-256 will negotiate custody.
 
-Every appended record must link to the prior `event_hash` and pass deterministic validation.
+Existing event bytes must not be silently rewritten to make history look cleaner. Corrections are new events that reference prior records.
+
+Every appended record must link to the prior `event_hash`, declare a `provenance_kind`, and pass deterministic validation.
+
+Allowed provenance classes are:
+
+- `primary_observation` — direct observation of the cited source or artifact;
+- `derived_statement` — interpretation or transformation derived from earlier witnessed events;
+- `correction` — a new record correcting an earlier witnessed event without deleting history;
+- `metadata` — ledger/protocol metadata rather than an observed external claim.
+
+`derived_statement` and `correction` records must include a non-empty `derived_from` array of earlier canonical `event_hash` values. Search suggestions, NEXUS prose, summaries, and model inference must never be smuggled in as `primary_observation`.
+
+## Adding a witnessed event
+
+1. Identify the direct source locator.
+2. Choose the correct `provenance_kind`.
+3. If the event is derived or corrective, list the earlier event hashes in `derived_from`.
+4. Set `sequence` to the next canonical ledger position.
+5. Set `previous_hash` to the current ledger head.
+6. Calculate `event_hash` over canonical JSON with `event_hash` omitted.
+7. Append one JSON object as one JSONL line.
+8. Run:
+
+```bash
+python3 tools/oracle.py validate
+python3 -W default -m unittest discover -s tests -v
+```
+
+If validation rejects the event, fix the event. Do not weaken the validator because the Oracle is being "difficult." That is approximately its job.
 
 ## NEXUS boundary
 
 Audit only visible inputs, outputs, citations, receipts, and explicit evidence. Do not request, persist, reconstruct, or claim access to hidden chain-of-thought.
 
-The Courtroom Stenographer may present ORACLE records, but NEXUS presentation does not become canonical ORACLE evidence unless separately witnessed.
+The Courtroom Stenographer may present ORACLE records, but NEXUS presentation does not become canonical ORACLE evidence unless separately witnessed and correctly classified.
 
 ## Timelock rules
 

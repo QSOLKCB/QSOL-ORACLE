@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/oracle-event.schema.json",
+  "title": "QSOL-ORACLE Witness Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "sequence",
+    "event_id",
+    "event_type",
+    "subject",
+    "observed_at",
+    "source",
+    "evidence",
+    "authority",
+    "previous_hash",
+    "note",
+    "event_hash"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE/1"},
+    "sequence": {"type": "integer", "minimum": 0},
+    "event_id": {"type": "string", "minLength": 1},
+    "event_type": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "payload_sha256"],
+      "properties": {
+        "state": {"enum": ["observed", "conflict", "unknown"]},
+        "payload_sha256": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "authority": {"const": "observation-only"},
+    "previous_hash": {
+      "anyOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"type": "null"}
+      ]
+    },
+    "note": {"type": "string"},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

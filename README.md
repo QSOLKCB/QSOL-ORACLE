@@ -1,19 +1,218 @@
-# QSOL-ORACLE   -    Feeds data back and forth from QSOL-CONTEXT , QSOL-ARK , QSOL-SUBSTRATE > QSOL-INT.
+# QSOL-ORACLE
 
-TIMELOCK.  Unlocks QSOL-CONTEXT in 30 years.
+**The evidentiary membrane around QSOL-NEXUS and the QSOL Three-Pillar architecture.**
 
+> **Maximum Truth Mode: enabled.**  
+> Maximum comfort, mystical certainty, and telling people what they wanted to hear were not included in the protocol.
 
-chainlink oracleChainlink is a decentralized oracle platform that connects blockchains to external, off-chain data and systems. It acts as a secure bridge, allowing smart contracts to safely use real-world information like asset prices, weather metrics, or bank payments.How Chainlink WorksData Request: A smart contract asks for specific off-chain data.Node Fetching: Multiple independent oracle nodes gather information from various outside sources.Consensus Check: Nodes check and combine the data to remove errors or fake inputs.On-Chain Delivery: The verified data goes back to the blockchain for the smart contract to use.Core ServicesPrice Feeds: Secure financial market data widely used in decentralized finance (DeFi).Cross-Chain Interoperability Protocol (CCIP): Secure messaging and token transfers between different blockchains.Verifiable Random Function (VRF): Tamper-proof random numbers for gaming and NFTs.Automation: Decentralized maintenance and upkeep for smart contract tasks.Watch this video to understand the mechanics of decentralized oracles:1mChainlink Explained: Decentralized Oracle Network for Beginners10 months agoYouTube · CodeLuckyWould you like to know how to integrate Chainlink Price Feeds into a smart contract, or do you want more details on Chainlink CCIP?AI responses may include mistakes. For financial advice, consult a professional. Learn moreChainlinkChainlink: The Industry-Standard Oracle PlatformChainlink is an industry-standard oracle platform that brings capital markets onchain. It's also the market leader for decentraliz...ChainlinkWhat Is an Oracle in Blockchain? » Explained - ChainlinkOracles are foundational to this new “onchain” economy. They not only connect blockchains to external data, systems, and technolog...ChainlinkWhat Is a Decentralized Oracle Network (DON)? - ChainlinkSmart contracts are deterministic applications running on blockchains, designed to execute agreements automatically when specific ...Show allsmart contractsA smart contract is a self-executing digital agreement with the terms directly written into lines of code. It automatically runs, controls, and documents transactions on a blockchain when predefined conditions are met, completely eliminating the need for central authorities, lawyers, or trusted third parties.⚙️ How Smart Contracts WorkAgreement definition: Parties code conditions into a script on a blockchain like Ethereum.Event trigger: An action occurs, like a payment arriving or a deadline passing.Data validation: Oracles (like Chainlink) verify external real-world data if needed.Auto-execution: The blockchain network updates instantly when code rules are met.Permanent settlement: The transaction locks forever onto the unchangeable digital ledger.💡 Key AdvantagesSpeed & efficiency: Automation removes manual paperwork and administrative delays.Trust & security: Encryption protects records from tampering or unauthorized changes.Cost savings: Removing brokers, agents, and intermediaries slashes transaction fees.Complete accuracy: Automated code eliminates human error during document processing.🔎 Real-World ApplicationsDecentralized Finance (DeFi): Automated lending, borrowing, and trading without traditional banks.Supply Chain: Instant payments trigger the moment a cargo container scans at a port.Real Estate: Digital property deeds transfer automatically once escrow funds clear.Gaming & NFTs: Dynamic updates to in-game items based on player achievements.Would you like to see a basic Solidity code example of a smart contract, or should we explore how they are used to automate supply chain logistics?AI responses may include mistakes. For financial advice, consult a professional. Learn moreAlgorandWhat are smart contracts?8 Jan 2024 — At its ( A smart contract ) core, it ( A smart contract ) 's a self-executing contract where the terms of the agreement between pa...Polity.org.zaPolity.org.za Smart contracts in South Africa: Legal recognition, challenges and the future of automated agreements30 Mar 2026 — A smart contract is a digital, self-executing agreement written in code and stored on a blockchain. It automatically carries out t...InvestopediaSmart Contracts on Blockchain: Definition, Functionality, and Applications17 Aug 2026 — What Is the Point of a Smart Contract? Smart contracts aim to eliminate the need for a trusted third party to facilitate actions b...Show allcould a smart contract be written to turn a private github repo to public in 30 years?Yes, theoretically, you could write a smart contract to trigger this, but in practice, it is highly likely to fail over a 30-year timeframe.While a blockchain can easily measure a 30-year time delay, it cannot interact directly with the internet. It requires an oracle network (like Chainlink) to connect to the GitHub REST API to execute a PATCH /repos/{owner}/{repo} request.Relying on this setup for three decades introduces several critical points of failure.⚠️ Major Points of FailureAPI Token Expiration: To change a repo's visibility, the oracle needs a GitHub Personal Access Token or OAuth token with administrative permissions. GitHub caps token lifetimes to a maximum of one year, and automatically revokes inactive tokens after a year of non-use. A token cannot remain valid for 30 years.Oracle Maintenance & Fees: The smart contract needs to hold enough cryptocurrency (like LINK) to pay for the oracle call 30 years from now. Predicting gas costs, oracle fee structures, or whether a specific oracle network will even exist in 2056 is nearly impossible.API Changes: GitHub modifies its API structure over time. A codebase or API endpoint written today is highly unlikely to remain identical or supported 30 years from now.Platform Risk: This architecture assumes that GitHub—and your specific user account—will still exist and operate under the same rules in three decades.🛠️ More Reliable AlternativesIf your goal is to lock code away and guarantee it becomes open-source in 30 years, look to decentralized alternatives instead of a centralized platform like GitHub.+------------------+     Encrypted     +-----------------------+
+QSOL-ORACLE is a public, vendor-neutral witness, attestation, routing, and temporal-contract layer for the QSOL ecosystem. It does **not** try to be an all-knowing AI. That job would be both impossible and, frankly, suspicious.
 
-|  Your Raw Code   | ----------------> |  IPFS / Arweave       |
-+------------------+                   |  (Permanent Storage)  |
-                                       +-----------------------+
-                                                   ^
-                                                   | Decryption Key
-                                                   | (Released in 30 Years)
-                                       +-----------------------+
+Its preferred answer when evidence runs out is:
 
-                                       | Smart Contract Time-  |
-                                       | Lock / Oracles        |
-                                       +-----------------------+
-Decentralized Storage + Time-Locked Encryption: Encrypt your repository locally. Upload the encrypted file to a permanent, decentralized storage network like Arweave or IPFS. You can then use a smart contract or a decentralized secret-sharing network to hold and automatically publish the decryption key after 30 years.Legal Code Trusts: Place the repository in a legal trust or use an established open-source foundation with a strict legal mandate to publish the private repository on a specific date.If you want to map out how this works, I can outline a Time-Locked Encryption workflow or explain how to write a basic Ethereum time-lock contract for releasing data. <<<>>> https://github.com/QSOLKCB/QSOL-CONTEXT/ <<< I want this repo to turn public via a timelock in 30 years.
+> **Sorry, I don't have that information. Here is what I do have, what is missing, and what you could search next.**
+
+The core rule is simple:
+
+```text
+QSOL-SUBSTRATE  KNOWS
+QSOL-ARK        SURVIVES
+QSOL-INT        COMPOSES
+QSOL-ORACLE     WITNESSES
+QSOL-NEXUS      REASONS ACROSS THEM
+```
+
+ORACLE sits outside the Three Pillars and can wrap around NEXUS:
+
+```text
+ external sources / repositories / releases / publications
+                         |
+                         v
+                +-----------------+
+                |   QSOL-ORACLE   |
+                |    WITNESSES    |
+                |                 |
+                | provenance      |
+                | observations    |
+                | conflicts       |
+                | unknowns        |
+                | timelocks       |
+                | witness ledger  |
+                |       |         |
+                |       v         |
+                | +-----------+   |
+                | |QSOL-NEXUS |   |
+                | |  REASONS  |   |
+                | +-----------+   |
+                |       |         |
+                | claim-boundary  |
+                | audit / receipt |
+                +-------+---------+
+                        |
+                        v
+                      USER
+```
+
+## Constitutional invariants
+
+```text
+OBSERVED != TRUE
+RECORDED != ENDORSED
+HASH_MATCH != AUTHENTICATED_AUTHORSHIP
+EVENT != SEMANTIC_AUTHORITY
+ARCHIVED != CANONICAL
+UNKNOWN > PLAUSIBLE_GUESS
+ORACLE_OBSERVATION != SOURCE_TRUTH
+ORACLE_ATTESTATION != SEMANTIC_AUTHORITY
+ORACLE_ROUTING != CANONICALIZATION
+ORACLE_TRIGGER != PERMISSION
+ORACLE_MAY_CONSTRAIN_NEXUS
+ORACLE_MUST_NOT_PRETEND_TO_BE_NEXUS
+NEXUS_MUST_NOT_PRESENT_REASONING_AS_ORACLE_EVIDENCE
+```
+
+The practical interpretation is equally simple: **ORACLE provides evidence; NEXUS provides understanding.**
+
+## What ORACLE does
+
+ORACLE is intended to provide deterministic, inspectable records for:
+
+- repository state and commit observations;
+- releases and publication events;
+- cross-repository fingerprints and compatibility receipts;
+- QSOL-SUBSTRATE public-state observations;
+- QSOL-ARK recovery-capability observations;
+- QSOL-INT compatibility/drift observations;
+- QSOL-NEXUS witness input/output receipts without capturing hidden reasoning;
+- DOI/publication observations;
+- append-only hash-linked event history;
+- explicit `known`, `conflict`, and `unknown` response states;
+- actionable research continuation hints when evidence is insufficient; and
+- long-horizon temporal contracts such as the QSOL-CONTEXT 2056 publication directive.
+
+ORACLE is **not** another knowledge base, another Council member, a truth machine, an AI deity, a blockchain, or a substitute for primary evidence.
+
+## The Maximum Truth response contract
+
+When ORACLE can establish something:
+
+```text
+KNOWN
+-> state the observation
+-> identify the source
+-> preserve provenance
+-> distinguish observation from interpretation
+```
+
+When sources disagree:
+
+```text
+CONFLICT
+-> preserve both sides
+-> identify the unresolved disagreement
+-> do not average disagreement into fake certainty
+```
+
+When evidence is insufficient:
+
+```text
+UNKNOWN
+-> say that the information is unavailable
+-> state what evidence is missing
+-> return useful search topics or primary-source targets
+-> do not convert the suggested search into evidence
+```
+
+The Oracle therefore has the unusual commercial disadvantage of sometimes answering **"I don't know."** This is considered a feature.
+
+## NEXUS and the Courtroom Stenographer
+
+QSOL-NEXUS already has a passive append-only **Courtroom Stenographer / Knowledge-Watchman** with zero control authority. ORACLE generalizes that pattern across the ecosystem.
+
+NEXUS may consume ORACLE feeds and expose them through its Stenographer UI/persona, but the public evidentiary record belongs outside NEXUS. The intended boundary is:
+
+```text
+ORACLE witnesses.
+NEXUS reasons.
+NEXUS may ask ORACLE for evidence.
+ORACLE may audit claim boundaries around NEXUS output.
+Neither inherits the other's authority.
+```
+
+See `docs/NEXUS.md` and `ai/nexus-boundary.json`.
+
+## Witness ledger
+
+`ledger/events.jsonl` is the bootstrap append-only witness ledger. Each record contains a sequence number, source locator, observation state, previous-record hash, and its own deterministic SHA-256 identity.
+
+Validate it with:
+
+```bash
+python3 tools/oracle.py validate
+```
+
+The ledger is evidence **about observations**. A valid hash chain does not magically make the contents scientifically true.
+
+## QSOL-CONTEXT 2056 timelock
+
+The founding temporal contract is `contracts/qsol-context-2056.json`.
+
+It records an explicit directive that **QSOLKCB/QSOL-CONTEXT becomes eligible for public release on 18 August 2056**, subject to fail-closed publication gates.
+
+Check the current state with:
+
+```bash
+python3 tools/oracle.py timelock
+python3 tools/oracle.py timelock --at 2056-08-18T00:00:00+09:30
+```
+
+The crucial distinction is:
+
+```text
+ELIGIBLE_FOR_PUBLICATION != ALREADY_PUBLIC
+TIME_REACHED != IGNORE_PRIVACY_OR_RIGHTS
+```
+
+The contract does not store a 30-year GitHub credential. That would not be an archival strategy; it would be a very slow security incident.
+
+A future executor must satisfy the then-current platform, authorization, provenance, and publication-clearance gates before changing visibility. The executor is replaceable; the semantic directive is not tied to GitHub surviving unchanged until 2056.
+
+See `docs/TIMELOCK.md`.
+
+## Repository layout
+
+```text
+QSOL-ORACLE/
+├── README.md
+├── README4AI.md
+├── AGENTS.md
+├── ROADMAP.md
+├── manifest.json
+├── ai/
+│   ├── constitution.json
+│   └── nexus-boundary.json
+├── contracts/
+│   └── qsol-context-2056.json
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── NEXUS.md
+│   └── TIMELOCK.md
+├── ledger/
+│   └── events.jsonl
+├── schema/
+│   └── oracle-event.schema.json
+├── tools/
+│   └── oracle.py
+├── tests/
+│   └── test_oracle.py
+└── .github/workflows/validate.yml
+```
+
+## Status
+
+**Bootstrap architecture implemented.** The repository now defines the witness role, Maximum Truth response contract, Three-Pillar authority firewall, NEXUS/Stenographer boundary, deterministic hash-linked ledger, and QSOL-TIMELOCK/1 contract for QSOL-CONTEXT.
+
+Live GitHub/Zenodo/repository collectors, signed attestations, NEXUS runtime transport, public feed generation, and future publication executors are sequenced in `ROADMAP.md`.
+
+---
+
+**QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say — which is terrible for prophecy, but rather useful for research.**

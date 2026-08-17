@@ -6,6 +6,7 @@
   "role": "witness-attestation-routing-temporal-contract-layer",
   "semantic_authority": "none-by-default",
   "reasoning_authority": "none",
+  "ledger_model": "single-writer-append-only",
   "entrypoint": "README4AI.md",
   "constitution": "ai/constitution.json",
   "nexus_boundary": "ai/nexus-boundary.json",
@@ -13,7 +14,7 @@
   "event_schema": "schema/oracle-event.schema.json",
   "founding_timelock": "contracts/qsol-context-2056.json",
   "validation_command": "python3 tools/oracle.py validate",
-  "test_command": "python3 -m unittest discover -s tests -v",
+  "test_command": "python3 -W default -m unittest discover -s tests -v",
   "roles": {
     "QSOL-SUBSTRATE": "KNOWS",
     "QSOL-ARK": "SURVIVES",
@@ -22,6 +23,12 @@
     "QSOL-NEXUS": "REASONS"
   },
   "response_states": ["known", "conflict", "unknown"],
+  "provenance_kinds": [
+    "primary_observation",
+    "derived_statement",
+    "correction",
+    "metadata"
+  ],
   "files": [
     "README.md",
     "README4AI.md",

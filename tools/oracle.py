@@ -15,8 +15,25 @@ LEDGER = ROOT / "ledger" / "events.jsonl"
 TIMELOCK = ROOT / "contracts" / "qsol-context-2056.json"
 MANIFEST = ROOT / "manifest.json"
 
+PROVENANCE_KINDS = {
+    "primary_observation",
+    "derived_statement",
+    "correction",
+    "metadata",
+}
+HASH_REFS_REQUIRED = {"derived_statement", "correction"}
+DECLARED_PATH_KEYS = {
+    "entrypoint",
+    "constitution",
+    "nexus_boundary",
+    "ledger",
+    "event_schema",
+    "founding_timelock",
+}
+
 
 def canonical_bytes(value: Any) -> bytes:
+    """Encode a value as deterministic canonical JSON bytes."""
     return json.dumps(
         value,
         sort_keys=True,
@@ -26,16 +43,19 @@ def canonical_bytes(value: Any) -> bytes:
 
 
 def sha256_value(value: Any) -> str:
+    """Return SHA-256 over canonical JSON bytes."""
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
 
 
 def event_hash(event: dict[str, Any]) -> str:
+    """Return the deterministic identity of an event excluding event_hash itself."""
     payload = dict(event)
     payload.pop("event_hash", None)
     return sha256_value(payload)
 
 
 def parse_time(value: str) -> datetime:
+    """Parse an ISO-8601 timestamp and require an explicit timezone."""
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
     parsed = datetime.fromisoformat(value)
@@ -45,11 +65,13 @@ def parse_time(value: str) -> datetime:
 
 
 def load_json(path: Path) -> dict[str, Any]:
+    """Load one UTF-8 JSON object."""
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
 def load_ledger(path: Path = LEDGER) -> list[dict[str, Any]]:
+    """Load the canonical single-writer JSONL ledger in file order."""
     events: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
         for line_number, raw in enumerate(handle, 1):
@@ -66,7 +88,16 @@ def load_ledger(path: Path = LEDGER) -> list[dict[str, Any]]:
     return events
 
 
+def _is_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
 def validate_event_shape(event: dict[str, Any], index: int) -> None:
+    """Validate the authority and provenance boundary of one witness event."""
     required = {
         "protocol",
         "sequence",
@@ -75,6 +106,7 @@ def validate_event_shape(event: dict[str, Any], index: int) -> None:
         "subject",
         "observed_at",
         "source",
+        "provenance_kind",
         "evidence",
         "authority",
         "previous_hash",
@@ -89,19 +121,44 @@ def validate_event_shape(event: dict[str, Any], index: int) -> None:
     if event["authority"] != "observation-only":
         raise ValueError(f"event {index}: ORACLE authority must remain observation-only")
     if event["sequence"] != index:
-        raise ValueError(f"event {index}: sequence must equal ledger position")
+        raise ValueError(
+            f"event {index}: sequence must equal canonical file position; "
+            "QSOL-ORACLE/1 uses a single-writer append-only ledger"
+        )
     parse_time(event["observed_at"])
+
+    provenance_kind = event.get("provenance_kind")
+    if provenance_kind not in PROVENANCE_KINDS:
+        raise ValueError(f"event {index}: invalid provenance_kind {provenance_kind!r}")
+
+    derived_from = event.get("derived_from")
+    if provenance_kind in HASH_REFS_REQUIRED:
+        if not isinstance(derived_from, list) or not derived_from:
+            raise ValueError(
+                f"event {index}: {provenance_kind} requires non-empty derived_from"
+            )
+        if len(set(derived_from)) != len(derived_from):
+            raise ValueError(f"event {index}: derived_from must not contain duplicates")
+        if not all(_is_sha256(reference) for reference in derived_from):
+            raise ValueError(f"event {index}: derived_from must contain SHA-256 event hashes")
+    elif derived_from is not None:
+        raise ValueError(
+            f"event {index}: derived_from is reserved for derived_statement/correction events"
+        )
+
     if event.get("evidence", {}).get("state") not in {"observed", "conflict", "unknown"}:
         raise ValueError(f"event {index}: invalid evidence state")
 
 
 def validate_ledger(path: Path = LEDGER) -> list[dict[str, Any]]:
+    """Validate the single-writer append-only hash chain in canonical file order."""
     events = load_ledger(path)
     if not events:
         raise ValueError("ledger must contain a genesis event")
 
     previous: str | None = None
     seen_ids: set[str] = set()
+    seen_hashes: set[str] = set()
     for index, event in enumerate(events):
         validate_event_shape(event, index)
         if event["event_id"] in seen_ids:
@@ -114,6 +171,14 @@ def validate_ledger(path: Path = LEDGER) -> list[dict[str, Any]]:
                 f"got {event['previous_hash']!r}"
             )
 
+        derived_from = event.get("derived_from", [])
+        missing_refs = [reference for reference in derived_from if reference not in seen_hashes]
+        if missing_refs:
+            raise ValueError(
+                f"event {index}: derived_from must reference earlier canonical events; "
+                f"missing {missing_refs}"
+            )
+
         expected = event_hash(event)
         if event["event_hash"] != expected:
             raise ValueError(
@@ -121,11 +186,41 @@ def validate_ledger(path: Path = LEDGER) -> list[dict[str, Any]]:
                 f"got {event['event_hash']}"
             )
         previous = event["event_hash"]
+        seen_hashes.add(previous)
 
     return events
 
 
+def validate_manifest(manifest: dict[str, Any], root: Path) -> list[str]:
+    """Validate manifest path safety, uniqueness, declared contracts, and existence."""
+    if manifest.get("protocol") != "QSOL-ORACLE/1":
+        raise ValueError("manifest protocol mismatch")
+    if manifest.get("ledger_model") != "single-writer-append-only":
+        raise ValueError("manifest must declare the single-writer append-only ledger model")
+
+    files = manifest.get("files")
+    if not isinstance(files, list) or not files or not all(isinstance(item, str) for item in files):
+        raise ValueError("manifest.files must be a non-empty list of repository-relative strings")
+    if len(set(files)) != len(files):
+        raise ValueError("manifest.files must not contain duplicates")
+
+    for relative in files:
+        path = Path(relative)
+        if path.is_absolute() or ".." in path.parts:
+            raise ValueError(f"manifest contains unsafe path: {relative}")
+        if not (root / path).exists():
+            raise ValueError(f"manifest references missing file: {relative}")
+
+    for key in DECLARED_PATH_KEYS:
+        declared = manifest.get(key)
+        if not isinstance(declared, str) or declared not in files:
+            raise ValueError(f"manifest {key} must name a path included in manifest.files")
+
+    return files
+
+
 def timelock_state(contract: dict[str, Any], at: datetime) -> str:
+    """Return locked or eligible without granting execution authority."""
     if at.tzinfo is None:
         raise ValueError("evaluation time must be timezone-aware")
     deadline = parse_time(contract["not_before"])
@@ -135,6 +230,7 @@ def timelock_state(contract: dict[str, Any], at: datetime) -> str:
 def unknown_response(
     missing_evidence: list[str], suggested_searches: list[str]
 ) -> dict[str, Any]:
+    """Return an actionable unknown without laundering search hints into evidence."""
     return {
         "protocol": "QSOL-ORACLE/1",
         "state": "unknown",
@@ -146,13 +242,9 @@ def unknown_response(
 
 
 def validate_repository(root: Path = ROOT) -> dict[str, Any]:
+    """Validate repository contracts, manifest, ledger, and founding timelock witness."""
     manifest = load_json(root / "manifest.json")
-    if manifest.get("protocol") != "QSOL-ORACLE/1":
-        raise ValueError("manifest protocol mismatch")
-
-    for relative in manifest.get("files", []):
-        if not (root / relative).exists():
-            raise ValueError(f"manifest references missing file: {relative}")
+    validate_manifest(manifest, root)
 
     constitution = load_json(root / "ai" / "constitution.json")
     if constitution.get("maximal_truth_mode") is not True:
@@ -183,6 +275,7 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
         "protocol": "QSOL-ORACLE/1",
         "status": "valid",
         "events": len(events),
+        "ledger_model": manifest["ledger_model"],
         "ledger_head": events[-1]["event_hash"],
         "timelock_contract_sha256": contract_digest,
     }

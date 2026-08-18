@@ -36,7 +36,7 @@
       }
     },
     "provenance_kind": {
-      "enum": ["primary_observation", "derived_statement", "correction", "metadata"]
+      "enum": ["primary_observation", "derived_statement", "correction", "supersession", "metadata"]
     },
     "derived_from": {
       "type": "array",
@@ -44,6 +44,7 @@
       "uniqueItems": true,
       "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
     },
+    "target_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "evidence": {
       "type": "object",
       "additionalProperties": false,
@@ -72,10 +73,24 @@
     {
       "if": {
         "properties": {
-          "provenance_kind": {"enum": ["derived_statement", "correction"]}
+          "provenance_kind": {"enum": ["derived_statement", "correction", "supersession"]}
         }
       },
       "then": {"required": ["derived_from"]}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "evidence.correction"}}},
+      "then": {
+        "required": ["derived_from", "target_event_hash"],
+        "properties": {"provenance_kind": {"const": "correction"}}
+      }
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "evidence.supersession"}}},
+      "then": {
+        "required": ["derived_from", "target_event_hash"],
+        "properties": {"provenance_kind": {"const": "supersession"}}
+      }
     }
   ]
 }

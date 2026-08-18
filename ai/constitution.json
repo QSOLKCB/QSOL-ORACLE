@@ -1,7 +1,7 @@
 {
   "type": "qsol-oracle-constitution",
   "protocol": "QSOL-ORACLE/1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "maximal_truth_mode": true,
   "motto": "QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say.",
   "roles": {
@@ -15,6 +15,11 @@
     "OBSERVED != TRUE",
     "RECORDED != ENDORSED",
     "HASH_MATCH != AUTHENTICATED_AUTHORSHIP",
+    "SIGNATURE_VALID != CLAIM_TRUE",
+    "CHECKPOINT_MATCH != SOURCE_TRUE",
+    "FRESH != TRUE",
+    "STALE != FALSE",
+    "COLLECTED != CANONICAL",
     "EVENT != SEMANTIC_AUTHORITY",
     "ARCHIVED != CANONICAL",
     "UNKNOWN > PLAUSIBLE_GUESS",
@@ -41,6 +46,18 @@
       "may_return": ["missing_evidence", "suggested_searches", "primary_source_targets"],
       "must_not": ["convert_search_suggestion_into_evidence", "fabricate_answer_to_avoid_uncertainty"]
     }
+  },
+  "signature_semantics": {
+    "purpose": "bind externally produced signature bytes to exact object identity",
+    "cryptographic_verification": "external",
+    "does_not_establish": ["semantic_truth", "scientific_validity", "canonical_status", "signer_intent_beyond_signature_scope"]
+  },
+  "freshness_semantics": {
+    "fresh": "source timestamp is within the configured observation window",
+    "stale": "source timestamp is older than the configured observation window",
+    "undated": "no usable source timestamp was available",
+    "future-dated": "source timestamp is later than the evaluation time",
+    "truth_rule": "freshness changes confidence in currency, not semantic truth value"
   },
   "authority_firewall": {
     "semantic_authority_owner": "QSOL-SUBSTRATE",

@@ -20,5 +20,11 @@ jobs:
         run: python3 -m compileall -q tools tests
       - name: Validate ORACLE contracts and ledger
         run: python3 tools/oracle.py validate
+      - name: Exercise offline collectors
+        run: |
+          python3 tools/oracle.py collect github.repository --fixture fixtures/collectors.json > /tmp/github-repo.json
+          python3 tools/oracle.py collect qsol.substrate --fixture fixtures/collectors.json > /tmp/substrate.json
+          python3 tools/oracle.py collect qsol.ark --fixture fixtures/collectors.json > /tmp/ark.json
+          python3 tools/oracle.py collect qsol.int --fixture fixtures/collectors.json > /tmp/int.json
       - name: Run regression tests with warnings
         run: python3 -W default -m unittest discover -s tests -v

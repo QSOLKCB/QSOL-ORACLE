@@ -1,0 +1,12 @@
+{
+  "authority": "integrity-only",
+  "checkpoint_sha256": "7e1a3b2f9fde666f88478515a2655720f03e9435588c6e8331ec8b059518ac45",
+  "event_count": 2,
+  "event_hashes_sha256": "d9377b19e7bb1434650153e45cc82b1d07fcea1edd6e2e757003a7a73dfbb663",
+  "ledger": "events.jsonl",
+  "ledger_bytes": 1322,
+  "ledger_head": "80468db2bf709982ce4eead9de02ba088306fd365dc999f860139e51987ed8ad",
+  "ledger_sha256": "e7a28744d42a137ab8b7ecc28017f921c12befee37898eb22a6a9bf37dc90fb4",
+  "protocol": "QSOL-ORACLE-CHECKPOINT/1",
+  "truth_claim": false
+}

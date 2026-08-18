@@ -2,16 +2,9 @@
 
 **The evidentiary membrane around QSOL-NEXUS and the QSOL Three-Pillar architecture.**
 
-> **Maximum Truth Mode: enabled.**  
-> Maximum comfort, mystical certainty, and telling people what they wanted to hear were not included in the protocol.
+> **Maximum Truth Mode: enabled.**
 
-QSOL-ORACLE is a public, vendor-neutral witness, attestation, routing, and temporal-contract layer for the QSOL ecosystem. It does **not** try to be an all-knowing AI. That job would be both impossible and, frankly, suspicious.
-
-Its preferred answer when evidence runs out is:
-
-> **Sorry, I don't have that information. Here is what I do have, what is missing, and what you could search next.**
-
-The core rule is simple:
+QSOL-ORACLE is a public, vendor-neutral witness, attestation, routing, and temporal-contract layer for the QSOL ecosystem. It records what a source was observed to say or contain without promoting that observation into semantic truth.
 
 ```text
 QSOL-SUBSTRATE  KNOWS
@@ -21,36 +14,7 @@ QSOL-ORACLE     WITNESSES
 QSOL-NEXUS      REASONS ACROSS THEM
 ```
 
-ORACLE sits outside the Three Pillars and can wrap around NEXUS:
-
-```text
- external sources / repositories / releases / publications
-                         |
-                         v
-                +-----------------+
-                |   QSOL-ORACLE   |
-                |    WITNESSES    |
-                |                 |
-                | provenance      |
-                | observations    |
-                | conflicts       |
-                | unknowns        |
-                | timelocks       |
-                | witness ledger  |
-                |       |         |
-                |       v         |
-                | +-----------+   |
-                | |QSOL-NEXUS |   |
-                | |  REASONS  |   |
-                | +-----------+   |
-                |       |         |
-                | claim-boundary  |
-                | audit / receipt |
-                +-------+---------+
-                        |
-                        v
-                      USER
-```
+The practical rule remains: **ORACLE provides evidence; NEXUS provides understanding.**
 
 ## Constitutional invariants
 
@@ -58,161 +22,138 @@ ORACLE sits outside the Three Pillars and can wrap around NEXUS:
 OBSERVED != TRUE
 RECORDED != ENDORSED
 HASH_MATCH != AUTHENTICATED_AUTHORSHIP
-EVENT != SEMANTIC_AUTHORITY
-ARCHIVED != CANONICAL
+SIGNATURE_VALID != CLAIM_TRUE
+CHECKPOINT_MATCH != SOURCE_TRUE
+FRESH != TRUE
+STALE != FALSE
+COLLECTED != CANONICAL
 UNKNOWN > PLAUSIBLE_GUESS
-ORACLE_OBSERVATION != SOURCE_TRUTH
-ORACLE_ATTESTATION != SEMANTIC_AUTHORITY
-ORACLE_ROUTING != CANONICALIZATION
-ORACLE_TRIGGER != PERMISSION
-ORACLE_MAY_CONSTRAIN_NEXUS
-ORACLE_MUST_NOT_PRETEND_TO_BE_NEXUS
-NEXUS_MUST_NOT_PRESENT_REASONING_AS_ORACLE_EVIDENCE
 ```
 
-The practical interpretation is equally simple: **ORACLE provides evidence; NEXUS provides understanding.**
+## Phase 1: deterministic witness ledger
 
-## What ORACLE does
-
-ORACLE is intended to provide deterministic, inspectable records for:
-
-- repository state and commit observations;
-- releases and publication events;
-- cross-repository fingerprints and compatibility receipts;
-- QSOL-SUBSTRATE public-state observations;
-- QSOL-ARK recovery-capability observations;
-- QSOL-INT compatibility/drift observations;
-- QSOL-NEXUS witness input/output receipts without capturing hidden reasoning;
-- DOI/publication observations;
-- append-only hash-linked event history;
-- explicit `known`, `conflict`, and `unknown` response states;
-- actionable research continuation hints when evidence is insufficient; and
-- long-horizon temporal contracts such as the QSOL-CONTEXT 2056 publication directive.
-
-ORACLE is **not** another knowledge base, another Council member, a truth machine, an AI deity, a blockchain, or a substitute for primary evidence.
-
-## The Maximum Truth response contract
-
-When ORACLE can establish something:
+The append-only ledger now supports explicit correction and supersession relationships:
 
 ```text
-KNOWN
--> state the observation
--> identify the source
--> preserve provenance
--> distinguish observation from interpretation
+evidence.correction
+  -> provenance_kind=correction
+  -> target_event_hash=<earlier event>
+  -> target is also in derived_from
+
+evidence.supersession
+  -> provenance_kind=supersession
+  -> target_event_hash=<earlier event>
+  -> target is also in derived_from
 ```
 
-When sources disagree:
+History is never rewritten to make the ledger prettier.
+
+### Detached signatures
+
+`QSOL-ORACLE-SIGNATURE/1` binds externally produced signature bytes to exact object bytes. The reference implementation validates the envelope and binding while leaving cryptographic key verification external.
+
+A valid signature is authentication evidence, not a universal truth wand. 🪄
+
+### Checkpoints and release fingerprints
+
+```bash
+python3 tools/oracle.py checkpoint
+python3 tools/oracle.py fingerprint
+```
+
+`ledger/checkpoint.json` deterministically binds the current ledger. `release/fingerprint.json` binds the manifest-declared canonical release identity set plus the ledger checkpoint.
+
+## Phase 2: feed collectors
+
+Implemented collectors:
+
+- GitHub repository state;
+- GitHub commit;
+- GitHub release;
+- GitHub tag;
+- GitHub Actions validation receipt;
+- Zenodo DOI/publication record;
+- QSOL-SUBSTRATE canonical fingerprint;
+- QSOL-ARK recovery capability; and
+- QSOL-INT compatibility/drift report.
+
+Collectors emit `QSOL-ORACLE-FEED/1` receipts. Receipts are observations and **are not automatically admitted to the canonical ledger**.
+
+### Freshness
+
+Every receipt has explicit freshness semantics: `fresh`, `stale`, `undated`, or `future-dated`.
 
 ```text
-CONFLICT
--> preserve both sides
--> identify the unresolved disagreement
--> do not average disagreement into fake certainty
+FRESH != TRUE
+STALE != FALSE
 ```
 
-When evidence is insufficient:
+Freshness measures currency. It does not magically validate the source's claim.
 
-```text
-UNKNOWN
--> say that the information is unavailable
--> state what evidence is missing
--> return useful search topics or primary-source targets
--> do not convert the suggested search into evidence
+### Offline deterministic CI
+
+```bash
+python3 tools/oracle.py collect github.repository --fixture fixtures/collectors.json
+python3 tools/oracle.py collect github.actions --fixture fixtures/collectors.json
+python3 tools/oracle.py collect qsol.substrate --fixture fixtures/collectors.json
+python3 tools/oracle.py collect qsol.ark --fixture fixtures/collectors.json
+python3 tools/oracle.py collect qsol.int --fixture fixtures/collectors.json
 ```
 
-The Oracle therefore has the unusual commercial disadvantage of sometimes answering **"I don't know."** This is considered a feature.
+The fixture bundle covers all nine collector kinds without network access.
 
-## NEXUS and the Courtroom Stenographer
+Live public GitHub and Zenodo API collection is also supported through the Python standard library. See `docs/FEEDS.md`.
 
-QSOL-NEXUS already has a passive append-only **Courtroom Stenographer / Knowledge-Watchman** with zero control authority. ORACLE generalizes that pattern across the ecosystem.
-
-NEXUS may consume ORACLE feeds and expose them through its Stenographer UI/persona, but the public evidentiary record belongs outside NEXUS. The intended boundary is:
-
-```text
-ORACLE witnesses.
-NEXUS reasons.
-NEXUS may ask ORACLE for evidence.
-ORACLE may audit claim boundaries around NEXUS output.
-Neither inherits the other's authority.
-```
-
-See `docs/NEXUS.md` and `ai/nexus-boundary.json`.
-
-## Witness ledger
-
-`ledger/events.jsonl` is the bootstrap append-only witness ledger. Each record contains a sequence number, source locator, observation state, previous-record hash, and its own deterministic SHA-256 identity.
-
-Validate it with:
+## Validate
 
 ```bash
 python3 tools/oracle.py validate
+python3 -W default -m unittest discover -s tests -v
 ```
-
-The ledger is evidence **about observations**. A valid hash chain does not magically make the contents scientifically true.
 
 ## QSOL-CONTEXT 2056 timelock
 
-The founding temporal contract is `contracts/qsol-context-2056.json`.
-
-It records an explicit directive that **QSOLKCB/QSOL-CONTEXT becomes eligible for public release on 18 August 2056**, subject to fail-closed publication gates.
-
-Check the current state with:
-
-```bash
-python3 tools/oracle.py timelock
-python3 tools/oracle.py timelock --at 2056-08-18T00:00:00+09:30
-```
-
-The crucial distinction is:
+The founding temporal contract remains `contracts/qsol-context-2056.json`.
 
 ```text
 ELIGIBLE_FOR_PUBLICATION != ALREADY_PUBLIC
 TIME_REACHED != IGNORE_PRIVACY_OR_RIGHTS
 ```
 
-The contract does not store a 30-year GitHub credential. That would not be an archival strategy; it would be a very slow security incident.
-
-A future executor must satisfy the then-current platform, authorization, provenance, and publication-clearance gates before changing visibility. The executor is replaceable; the semantic directive is not tied to GitHub surviving unchanged until 2056.
-
-See `docs/TIMELOCK.md`.
+The contract stores no thirty-year credential. Future execution requires then-current authorization and every fail-closed publication gate.
 
 ## Repository layout
 
 ```text
 QSOL-ORACLE/
-├── README.md
-├── README4AI.md
-├── AGENTS.md
-├── ROADMAP.md
-├── manifest.json
 ├── ai/
-│   ├── constitution.json
-│   └── nexus-boundary.json
 ├── contracts/
-│   └── qsol-context-2056.json
 ├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── NEXUS.md
-│   └── TIMELOCK.md
+│   └── FEEDS.md
+├── fixtures/
+│   └── collectors.json
 ├── ledger/
-│   └── events.jsonl
+│   ├── events.jsonl
+│   └── checkpoint.json
+├── release/
+│   └── fingerprint.json
 ├── schema/
-│   └── oracle-event.schema.json
+│   ├── oracle-event.schema.json
+│   ├── detached-signature.schema.json
+│   ├── feed-receipt.schema.json
+│   ├── ledger-checkpoint.schema.json
+│   └── release-fingerprint.schema.json
 ├── tools/
-│   └── oracle.py
-├── tests/
-│   └── test_oracle.py
-└── .github/workflows/validate.yml
+│   ├── oracle.py
+│   └── collectors.py
+└── tests/
+    └── test_oracle.py
 ```
 
 ## Status
 
-**Bootstrap architecture implemented.** The repository now defines the witness role, Maximum Truth response contract, Three-Pillar authority firewall, NEXUS/Stenographer boundary, deterministic hash-linked ledger, and QSOL-TIMELOCK/1 contract for QSOL-CONTEXT.
-
-Live GitHub/Zenodo/repository collectors, signed attestations, NEXUS runtime transport, public feed generation, and future publication executors are sequenced in `ROADMAP.md`.
+**Roadmap Phases 0, 1, and 2 are implemented.** Phase 3 remains the ORACLE↔NEXUS transport membrane and visible-claim audit layer.
 
 ---
 
-**QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say — which is terrible for prophecy, but rather useful for research.**
+**QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say.**

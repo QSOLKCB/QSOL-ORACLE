@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/feed-receipt.schema.json",
+  "title": "QSOL-ORACLE Feed Observation Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "collector", "subject", "source", "acquisition", "freshness", "observation", "observation_sha256", "authority", "truth_claim", "receipt_sha256"],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-FEED/1"},
+    "collector": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "payload_sha256"],
+      "properties": {
+        "locator": {"type": "string", "minLength": 1},
+        "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "fixture_sha256"],
+      "properties": {
+        "mode": {"enum": ["live", "fixture", "local-file"]},
+        "fixture_sha256": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "source_time", "evaluated_at", "max_age_seconds", "age_seconds", "stale_means_false", "fresh_means_true"],
+      "properties": {
+        "state": {"enum": ["fresh", "stale", "undated", "future-dated"]},
+        "source_time": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+        "evaluated_at": {"type": "string"},
+        "max_age_seconds": {"type": "integer", "minimum": 0},
+        "age_seconds": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
+        "stale_means_false": {"const": false},
+        "fresh_means_true": {"const": false}
+      }
+    },
+    "observation": {"type": "object"},
+    "observation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority": {"const": "observation-only"},
+    "truth_claim": {"const": false},
+    "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

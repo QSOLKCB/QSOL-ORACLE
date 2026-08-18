@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/ledger-checkpoint.schema.json",
+  "title": "QSOL-ORACLE Ledger Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "ledger", "event_count", "ledger_head", "ledger_bytes", "ledger_sha256", "event_hashes_sha256", "authority", "truth_claim", "checkpoint_sha256"],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-CHECKPOINT/1"},
+    "ledger": {"type": "string", "minLength": 1},
+    "event_count": {"type": "integer", "minimum": 1},
+    "ledger_head": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ledger_bytes": {"type": "integer", "minimum": 1},
+    "ledger_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "event_hashes_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority": {"const": "integrity-only"},
+    "truth_claim": {"const": false},
+    "checkpoint_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

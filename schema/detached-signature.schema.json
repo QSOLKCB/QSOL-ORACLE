@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/detached-signature.schema.json",
+  "title": "QSOL-ORACLE Detached Signature Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "object", "signature", "created_at", "authority", "cryptographic_verification", "truth_claim", "envelope_sha256"],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-SIGNATURE/1"},
+    "object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "id": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "encoding", "value", "signature_sha256"],
+      "properties": {
+        "algorithm": {"type": "string", "minLength": 1},
+        "key_id": {"type": "string", "minLength": 1},
+        "encoding": {"const": "base64"},
+        "value": {"type": "string", "minLength": 1},
+        "signature_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "authority": {"const": "authentication-evidence-only"},
+    "cryptographic_verification": {"const": "external"},
+    "truth_claim": {"const": false},
+    "envelope_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

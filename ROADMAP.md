@@ -17,21 +17,21 @@
 - [x] Add schema and standard-library validator.
 - [x] Record the ORACLE genesis event.
 - [x] Record the QSOL-CONTEXT 2056 directive as a witnessed event.
-- [ ] Add explicit correction/supersession event types.
-- [ ] Add detached signatures without making signatures equal truth.
-- [ ] Add deterministic ledger checkpoints and release fingerprints.
+- [x] Add explicit correction/supersession event types.
+- [x] Add detached signatures without making signatures equal truth.
+- [x] Add deterministic ledger checkpoints and release fingerprints.
 
 ## Phase 2 — Feed collectors
 
-- [ ] GitHub repository state collector.
-- [ ] GitHub commit/release/tag collector.
-- [ ] GitHub Actions/validation receipt collector.
-- [ ] Zenodo DOI/publication collector.
-- [ ] QSOL-SUBSTRATE snapshot/fingerprint collector.
-- [ ] QSOL-ARK recovery-capability collector.
-- [ ] QSOL-INT compatibility/drift collector.
-- [ ] Explicit freshness and stale-source semantics.
-- [ ] Offline fixture mode for deterministic CI.
+- [x] GitHub repository state collector.
+- [x] GitHub commit/release/tag collector.
+- [x] GitHub Actions/validation receipt collector.
+- [x] Zenodo DOI/publication collector.
+- [x] QSOL-SUBSTRATE snapshot/fingerprint collector.
+- [x] QSOL-ARK recovery-capability collector.
+- [x] QSOL-INT compatibility/drift collector.
+- [x] Explicit freshness and stale-source semantics.
+- [x] Offline fixture mode for deterministic CI.
 
 ## Phase 3 — QSOL-NEXUS membrane
 

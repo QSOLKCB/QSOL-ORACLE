@@ -1,0 +1,213 @@
+{
+  "protocol": "QSOL-ORACLE-FIXTURES/1",
+  "cases": [
+    {
+      "id": "github.repository",
+      "collector": "github.repository",
+      "subject": "QSOLKCB/QSOL-ORACLE",
+      "source_locator": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 172800,
+      "payload": {
+        "full_name": "QSOLKCB/QSOL-ORACLE",
+        "default_branch": "main",
+        "visibility": "public",
+        "private": false,
+        "archived": false,
+        "fork": false,
+        "open_issues_count": 0,
+        "updated_at": "2026-08-18T22:00:00Z",
+        "pushed_at": "2026-08-18T21:30:00Z"
+      }
+    },
+    {
+      "id": "github.commit",
+      "collector": "github.commit",
+      "subject": "QSOLKCB/QSOL-ORACLE@d0cfb231",
+      "source_locator": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE/commits/d0cfb231",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 172800,
+      "payload": {
+        "sha": "d0cfb23177aae4acb13ddf7a6e7c90c02a91f48d",
+        "html_url": "https://github.com/QSOLKCB/QSOL-ORACLE/commit/d0cfb23177aae4acb13ddf7a6e7c90c02a91f48d",
+        "commit": {
+          "committer": {"date": "2026-08-17T21:24:58Z"},
+          "tree": {"sha": "a9324dafffd48f32f80bf8faf5285579c3068cec"},
+          "verification": {"verified": true, "reason": "valid"}
+        }
+      }
+    },
+    {
+      "id": "github.release",
+      "collector": "github.release",
+      "subject": "QSOLKCB/QSOL-ORACLE:v0.1.0",
+      "source_locator": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE/releases/tags/v0.1.0",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 604800,
+      "payload": {
+        "id": 1001,
+        "tag_name": "v0.1.0",
+        "target_commitish": "main",
+        "draft": false,
+        "prerelease": false,
+        "published_at": "2026-08-18T02:00:00Z",
+        "created_at": "2026-08-18T01:55:00Z",
+        "html_url": "https://github.com/QSOLKCB/QSOL-ORACLE/releases/tag/v0.1.0"
+      }
+    },
+    {
+      "id": "github.tag",
+      "collector": "github.tag",
+      "subject": "QSOLKCB/QSOL-ORACLE:refs/tags/v0.1.0",
+      "source_locator": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE/git/ref/tags/v0.1.0",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 604800,
+      "source_time": null,
+      "payload": {
+        "ref": "refs/tags/v0.1.0",
+        "node_id": "fixture-tag-node",
+        "object": {
+          "type": "commit",
+          "sha": "d0cfb23177aae4acb13ddf7a6e7c90c02a91f48d",
+          "url": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE/git/commits/d0cfb23177aae4acb13ddf7a6e7c90c02a91f48d"
+        }
+      }
+    },
+    {
+      "id": "github.actions",
+      "collector": "github.actions",
+      "subject": "QSOLKCB/QSOL-ORACLE:run:2001",
+      "source_locator": "https://api.github.com/repos/QSOLKCB/QSOL-ORACLE/actions/runs/2001",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 172800,
+      "payload": {
+        "id": 2001,
+        "name": "validate-oracle",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "d0cfb23177aae4acb13ddf7a6e7c90c02a91f48d",
+        "run_attempt": 1,
+        "created_at": "2026-08-18T21:00:00Z",
+        "updated_at": "2026-08-18T21:03:00Z",
+        "html_url": "https://github.com/QSOLKCB/QSOL-ORACLE/actions/runs/2001"
+      }
+    },
+    {
+      "id": "zenodo.record",
+      "collector": "zenodo.record",
+      "subject": "doi:10.5281/zenodo.21935097",
+      "source_locator": "https://zenodo.org/api/records/21935097",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 1209600,
+      "payload": {
+        "id": 21935097,
+        "doi": "10.5281/zenodo.21935097",
+        "conceptdoi": "10.5281/zenodo.21935096",
+        "metadata": {
+          "title": "Fixture publication",
+          "version": "1.0.0",
+          "publication_date": "2026-08-15",
+          "resource_type": {"id": "software"}
+        },
+        "files": [
+          {"key": "artifact.zip", "size": 4096, "checksum": "md5:00000000000000000000000000000000"},
+          {"key": "README.md", "size": 512, "checksum": "md5:11111111111111111111111111111111"}
+        ]
+      }
+    },
+    {
+      "id": "qsol.substrate",
+      "collector": "qsol.substrate",
+      "subject": "QSOLKCB/QSOL-SUBSTRATE:canonical_public_payload",
+      "source_locator": "QSOL-SUBSTRATE:dist/fingerprint.json",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 604800,
+      "payload": {
+        "type": "qsol-substrate-fingerprint",
+        "schema_version": "1.0.0",
+        "scope": "canonical_public_payload",
+        "snapshot_date": "2026-08-15",
+        "canonicalization": {
+          "json": "qsol-canonical-json-v1",
+          "jsonl": "qsol-canonical-jsonl-v1"
+        },
+        "files": [
+          {"path": "identity/public.json", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bytes": 100},
+          {"path": "projects/index.json", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "bytes": 200}
+        ],
+        "substrate_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    {
+      "id": "qsol.ark",
+      "collector": "qsol.ark",
+      "subject": "QSOLKCB/QSOL-ARK:recovery-capability",
+      "source_locator": "QSOL-ARK:manifest.json+ai/recovery-contract.json",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 604800,
+      "source_time": null,
+      "payload": {
+        "manifest": {
+          "type": "qsol-ark-manifest",
+          "protocol": "QSOL-ARK",
+          "schema_version": "0.6.0",
+          "status": "computational_archaeology_plus_cultural_seed_plus_ancient_systems_plus_public_context_seeds",
+          "entrypoints": {"recovery_contract": "ai/recovery-contract.json"},
+          "implemented_recovery_tiers": ["T0", "T1", "T2", "T3", "T4"],
+          "implemented_interface": null
+        },
+        "recovery_contract": {
+          "type": "qsol-ark-recovery-contract",
+          "protocol": "QSOL-ARK",
+          "status": "specification_only",
+          "stages": [
+            {"id": "stage.0.integrity"},
+            {"id": "stage.1.identity"},
+            {"id": "stage.2.terminology"},
+            {"id": "stage.3.epistemic"},
+            {"id": "stage.4.reproduce"},
+            {"id": "stage.5.contradictions"},
+            {"id": "stage.6.reconstruct"},
+            {"id": "stage.7.report"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "qsol.int",
+      "collector": "qsol.int",
+      "subject": "QSOLKCB/QSOL-INT:pinned-bootstrap",
+      "source_locator": "QSOL-INT:compatibility/reports/pinned-bootstrap.json",
+      "evaluated_at": "2026-08-19T00:00:00Z",
+      "max_age_seconds": 604800,
+      "source_time": null,
+      "payload": {
+        "type": "qsol-int-compatibility-report",
+        "protocol": "QSOL-INT",
+        "version": "0.3.0",
+        "scope": "pinned_parent_evidence_only",
+        "compatibility": "compatible",
+        "fingerprint_sha256": "c4eff331c5428e3bfbd2497d25e4be2ce99c35a30005c9151c8dac8a312b3133",
+        "live_parent_freshness": "untested",
+        "parents": {
+          "ark": {
+            "protocol": "QSOL-ARK",
+            "repository": "https://github.com/QSOLKCB/QSOL-ARK",
+            "pinned_commit": "f2bbf149abb3f8ccbfed158176873d813b66b546"
+          },
+          "substrate": {
+            "protocol": "QSOL-SUBSTRATE",
+            "repository": "https://github.com/QSOLKCB/QSOL-SUBSTRATE",
+            "pinned_commit": "60e8cfeefa859df375f9f4d2fdb735edb1249db8"
+          }
+        },
+        "summary": {
+          "failed": 0,
+          "passed": 9,
+          "requires_live_drift_check_for_current_parent_claim": true
+        }
+      }
+    }
+  ]
+}

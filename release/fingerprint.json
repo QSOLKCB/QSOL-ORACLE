@@ -1,0 +1,121 @@
+{
+  "authority": "integrity-only",
+  "files": [
+    {
+      "bytes": 1063,
+      "path": ".github/workflows/validate.yml",
+      "sha256": "f2a96cd98ed8c2ea8e70c621356537b81c95e0fbddeefb15893a65913af3bce5"
+    },
+    {
+      "bytes": 2729,
+      "path": "ai/constitution.json",
+      "sha256": "b023d9c0c0b64bbd4c79c7643434ba5640ab7fa5a6e7189dc5f720733ae7de46"
+    },
+    {
+      "bytes": 1576,
+      "path": "ai/nexus-boundary.json",
+      "sha256": "46301e6bdac0a99abb42f376d8fecdbcc24cef1bbfc4ccab7c54e003dd08bff5"
+    },
+    {
+      "bytes": 1425,
+      "path": "contracts/qsol-context-2056.json",
+      "sha256": "3cc38e1b72df28a2a3ba8ac9499c2a82db092cb660034b0211cc7c98c5a836f7"
+    },
+    {
+      "bytes": 7886,
+      "path": "fixtures/collectors.json",
+      "sha256": "a29aaf04c9610c3c7c7d6b8666974881ef00b47cc23f5d15ee31fb9a3f096f9b"
+    },
+    {
+      "bytes": 530,
+      "path": "ledger/checkpoint.json",
+      "sha256": "2daa2bf4c7297852a9b83e0d3afa64ab1821e9dd059a1331404ab29d7430a2ed"
+    },
+    {
+      "bytes": 1322,
+      "path": "ledger/events.jsonl",
+      "sha256": "e7a28744d42a137ab8b7ecc28017f921c12befee37898eb22a6a9bf37dc90fb4"
+    },
+    {
+      "bytes": 3723,
+      "path": "manifest.json",
+      "sha256": "8a66d971b94ffcf348e3a5dfcc60d2d4f279c6feffdc1d7bfb298eb0f3f2453c"
+    },
+    {
+      "bytes": 1555,
+      "path": "schema/detached-signature.schema.json",
+      "sha256": "fa8fc99bcdc1d0e63b18f488515e002aad36fe325d44f2a87ff00593602c3a64"
+    },
+    {
+      "bytes": 2203,
+      "path": "schema/feed-receipt.schema.json",
+      "sha256": "a9f189e5621009d5254d174ef6bcae802fb09d3cbbe9b4b721b70ab4208495f6"
+    },
+    {
+      "bytes": 1011,
+      "path": "schema/ledger-checkpoint.schema.json",
+      "sha256": "ab073b77ece6a63f8b6d2e8b4928bf7c8b3f6b8ac85409168ad4fd11679b72f3"
+    },
+    {
+      "bytes": 2809,
+      "path": "schema/oracle-event.schema.json",
+      "sha256": "c909478aef18e030d2d5739d8c10ec377e106fa3c435f8ec216400d40c499158"
+    },
+    {
+      "bytes": 1237,
+      "path": "schema/release-fingerprint.schema.json",
+      "sha256": "fa289aeed2054a71d0912f9bab990c9d8ab8893ad045137312bebbfda164d216"
+    },
+    {
+      "bytes": 14249,
+      "path": "tests/test_oracle.py",
+      "sha256": "c209ef4063a623f8ec3c7f618cce0fa71e9ed41eef4063fe692cefb9326972f5"
+    },
+    {
+      "bytes": 2043,
+      "path": "tools/collector_io.py",
+      "sha256": "f415e799216d78502ce704af9da9ce4a976aafd7236064d4c291e09a54975930"
+    },
+    {
+      "bytes": 8178,
+      "path": "tools/collector_normalizers.py",
+      "sha256": "99b0018a5b09c81e58a4f7ed7165936a5f08a44357bc3052786eb56ffb8ecae6"
+    },
+    {
+      "bytes": 6565,
+      "path": "tools/collectors.py",
+      "sha256": "0f7c78a358bfaab75415868fc36935e49275b6a7fe241ef15fd99bfb5d8fe9dc"
+    },
+    {
+      "bytes": 5254,
+      "path": "tools/oracle.py",
+      "sha256": "d3cc01b09451190eca9378dc3094066b2ff280d147e0213cf0f49d56b1237b0a"
+    },
+    {
+      "bytes": 5905,
+      "path": "tools/oracle_cli.py",
+      "sha256": "81dd8ebb4f1294311c6f225297dda45babb9c5f7a2f4415c8f73b8cf2892ecf2"
+    },
+    {
+      "bytes": 2837,
+      "path": "tools/oracle_contracts.py",
+      "sha256": "511dc08376d49d77a80ceb7dc7e5e1ef55e55adb7fededdcf35677fb62f9dfdf"
+    },
+    {
+      "bytes": 8033,
+      "path": "tools/oracle_integrity.py",
+      "sha256": "314ee2cfa689963140bdc2d2f6c2cfc0aa04ed00781bd44566926a47dbf07177"
+    },
+    {
+      "bytes": 7266,
+      "path": "tools/oracle_ledger.py",
+      "sha256": "90b98e3164ce71df8f86b427e9ea9cf0f32558222356e4c6e9d1133984fd8918"
+    }
+  ],
+  "files_sha256": "25e9e64eeaa4231d8c38ac9a3f9f16b34dd597a31329f475437a25ec64339666",
+  "ledger_checkpoint_sha256": "7e1a3b2f9fde666f88478515a2655720f03e9435588c6e8331ec8b059518ac45",
+  "protocol": "QSOL-ORACLE-RELEASE/1",
+  "release_fingerprint_sha256": "0133f9debacef836cb380befb76cacd43e3df70bb4064054d9bb969b601f7134",
+  "scope": "oracle-canonical-contracts-tools-fixtures",
+  "truth_claim": false
+}

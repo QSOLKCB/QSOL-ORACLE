@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/release-fingerprint.schema.json",
+  "title": "QSOL-ORACLE Release Fingerprint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "scope", "files", "files_sha256", "ledger_checkpoint_sha256", "authority", "truth_claim", "release_fingerprint_sha256"],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-RELEASE/1"},
+    "scope": {"type": "string", "minLength": 1},
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "files_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ledger_checkpoint_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority": {"const": "integrity-only"},
+    "truth_claim": {"const": false},
+    "release_fingerprint_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

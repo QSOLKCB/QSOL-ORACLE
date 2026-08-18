@@ -34,6 +34,10 @@ def _is_sha256(value: Any) -> bool:
     return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
 
 
+def _is_non_empty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value)
+
+
 def _load_events(path: Path) -> list[dict[str, Any]]:
     events = []
     for line_no, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -103,6 +107,12 @@ def detached_signature_envelope(*, object_kind: str, object_id: str, object_sha2
 
 
 def validate_detached_signature_envelope(envelope: dict[str, Any], object_bytes: bytes | None = None) -> None:
+    required_envelope_fields = {
+        "protocol", "object", "signature", "created_at", "authority",
+        "cryptographic_verification", "truth_claim", "envelope_sha256",
+    }
+    if set(envelope) != required_envelope_fields:
+        raise ValueError("detached signature envelope fields do not match schema")
     if envelope.get("protocol") != "QSOL-ORACLE-SIGNATURE/1":
         raise ValueError("detached signature protocol mismatch")
     if envelope.get("authority") != "authentication-evidence-only":
@@ -111,21 +121,43 @@ def validate_detached_signature_envelope(envelope: dict[str, Any], object_bytes:
         raise ValueError("a detached signature must not be equated with semantic truth")
     if envelope.get("cryptographic_verification") != "external":
         raise ValueError("reference implementation expects external cryptographic verification")
-    parse_time(envelope["created_at"])
+    created_at = envelope.get("created_at")
+    if not _is_non_empty_string(created_at):
+        raise ValueError("detached signature created_at must be a non-empty string")
+    parse_time(created_at)
+
     obj, signature = envelope.get("object"), envelope.get("signature")
-    if not isinstance(obj, dict) or not _is_sha256(obj.get("sha256")):
+    required_object_fields = {"kind", "id", "sha256"}
+    if not isinstance(obj, dict) or set(obj) != required_object_fields:
+        raise ValueError("detached signature object binding fields do not match schema")
+    if not _is_non_empty_string(obj.get("kind")) or not _is_non_empty_string(obj.get("id")):
+        raise ValueError("detached signature object kind and id must be non-empty strings")
+    if not _is_sha256(obj.get("sha256")):
         raise ValueError("detached signature object binding invalid")
-    if not isinstance(signature, dict) or signature.get("encoding") != "base64":
+
+    required_signature_fields = {"algorithm", "key_id", "encoding", "value", "signature_sha256"}
+    if not isinstance(signature, dict) or set(signature) != required_signature_fields:
+        raise ValueError("detached signature fields do not match schema")
+    if not _is_non_empty_string(signature.get("algorithm")) or not _is_non_empty_string(signature.get("key_id")):
+        raise ValueError("detached signature algorithm and key_id must be non-empty strings")
+    if signature.get("encoding") != "base64":
         raise ValueError("detached signature encoding invalid")
+    if not _is_non_empty_string(signature.get("value")):
+        raise ValueError("detached signature value must be a non-empty string")
+    if not _is_sha256(signature.get("signature_sha256")):
+        raise ValueError("detached signature byte digest invalid")
     try:
-        signature_bytes = base64.b64decode(signature.get("value", ""), validate=True)
+        signature_bytes = base64.b64decode(signature["value"], validate=True)
     except (ValueError, TypeError) as exc:
         raise ValueError("detached signature base64 invalid") from exc
-    if not signature_bytes or signature.get("signature_sha256") != sha256_bytes(signature_bytes):
+    if not signature_bytes or signature["signature_sha256"] != sha256_bytes(signature_bytes):
         raise ValueError("detached signature byte digest mismatch")
     if object_bytes is not None and obj["sha256"] != sha256_bytes(object_bytes):
         raise ValueError("detached signature object digest does not match supplied object bytes")
+
     supplied = envelope.get("envelope_sha256")
+    if not _is_sha256(supplied):
+        raise ValueError("detached signature envelope digest invalid")
     payload = dict(envelope)
     payload.pop("envelope_sha256", None)
     if supplied != sha256_value(payload):

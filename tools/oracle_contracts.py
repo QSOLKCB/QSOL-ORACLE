@@ -6,7 +6,16 @@ from pathlib import Path
 from typing import Any
 
 
-def validate_manifest(manifest: dict[str, Any], root: Path, *, declared_path_keys: set[str], provenance_kinds: set[str], collector_kinds: set[str], freshness_states: set[str]) -> list[str]:
+def validate_manifest(
+    manifest: dict[str, Any],
+    root: Path,
+    *,
+    declared_path_keys: set[str],
+    provenance_kinds: set[str],
+    collector_kinds: set[str],
+    freshness_states: set[str],
+    relation_event_types: dict[str, str],
+) -> list[str]:
     if manifest.get("protocol") != "QSOL-ORACLE/1": raise ValueError("manifest protocol mismatch")
     if manifest.get("ledger_model") != "single-writer-append-only": raise ValueError("manifest must declare the single-writer append-only ledger model")
     files = manifest.get("files")
@@ -20,6 +29,7 @@ def validate_manifest(manifest: dict[str, Any], root: Path, *, declared_path_key
         declared = manifest.get(key)
         if not isinstance(declared, str) or declared not in files: raise ValueError(f"manifest {key} must name a path included in manifest.files")
     if set(manifest.get("provenance_kinds", [])) != provenance_kinds: raise ValueError("manifest provenance_kinds must match validator semantics")
+    if manifest.get("relation_event_types") != relation_event_types: raise ValueError("manifest relation_event_types must match ledger validator semantics")
     if set(manifest.get("collectors", [])) != collector_kinds: raise ValueError("manifest collectors must match collector implementation")
     if set(manifest.get("freshness_states", [])) != freshness_states: raise ValueError("manifest freshness_states must match collector implementation")
     paths = manifest.get("release_fingerprint_paths")

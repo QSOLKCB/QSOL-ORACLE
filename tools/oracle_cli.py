@@ -41,10 +41,14 @@ def _collect(api, args):
     if args.fixture:
         case_id = args.fixture_case or args.kind
         case, receipt = c.load_fixture_case(Path(args.fixture), case_id)
-        if args.at:
+        if case.get("collector") != args.kind:
+            raise ValueError(
+                f"fixture case collector mismatch: requested {args.kind!r}, case declares {case.get('collector')!r}"
+            )
+        if args.at or args.max_age is not None:
             receipt = c.collect_from_payload(
                 kind=case["collector"], subject=case["subject"], source_locator=case["source_locator"],
-                payload=case["payload"], evaluated_at=args.at,
+                payload=case["payload"], evaluated_at=args.at or case["evaluated_at"],
                 max_age_seconds=args.max_age if args.max_age is not None else case["max_age_seconds"],
                 acquisition_mode="fixture", source_time=case.get("source_time"),
                 fixture_sha256=c.sha256_bytes(Path(args.fixture).read_bytes()))

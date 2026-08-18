@@ -33,6 +33,9 @@ RELATION_EVENT_TYPES = {
     "evidence.correction": "correction",
     "evidence.supersession": "supersession",
 }
+MANIFEST_RELATION_EVENT_TYPES = {
+    provenance_kind: event_type for event_type, provenance_kind in RELATION_EVENT_TYPES.items()
+}
 DECLARED_PATH_KEYS = {
     "entrypoint", "constitution", "nexus_boundary", "ledger", "event_schema",
     "founding_timelock", "checkpoint", "release_fingerprint", "signature_schema",
@@ -58,9 +61,18 @@ from oracle_integrity import (
     validate_detached_signature_envelope, build_release_fingerprint, validate_release_fingerprint,
 )
 
+
 def validate_manifest(manifest: dict[str, Any], root: Path) -> list[str]:
     import oracle_contracts
-    return oracle_contracts.validate_manifest(manifest, root, declared_path_keys=DECLARED_PATH_KEYS, provenance_kinds=PROVENANCE_KINDS, collector_kinds=collectors.COLLECTOR_KINDS, freshness_states=collectors.FRESHNESS_STATES)
+    return oracle_contracts.validate_manifest(
+        manifest,
+        root,
+        declared_path_keys=DECLARED_PATH_KEYS,
+        provenance_kinds=PROVENANCE_KINDS,
+        collector_kinds=collectors.COLLECTOR_KINDS,
+        freshness_states=collectors.FRESHNESS_STATES,
+        relation_event_types=MANIFEST_RELATION_EVENT_TYPES,
+    )
 
 
 def timelock_state(contract: dict[str, Any], at: datetime) -> str:
@@ -87,6 +99,7 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
         "SIGNATURE_VALID != CLAIM_TRUE",
         "FRESH != TRUE",
         "STALE != FALSE",
+        "COLLECTED != CANONICAL",
     }:
         if required not in invariants:
             raise ValueError(f"constitution missing invariant: {required}")
@@ -126,8 +139,6 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
         "timelock_contract_sha256": contract_digest,
         "collector_count": len(collectors.COLLECTOR_KINDS),
     }
-
-
 
 
 def main() -> int:

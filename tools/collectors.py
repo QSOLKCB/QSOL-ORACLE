@@ -102,9 +102,9 @@ def freshness_state(
     }
 
 
-
 from collector_normalizers import NORMALIZERS, infer_source_time, _require_mapping
 from collector_io import fetch_json, github_url, zenodo_url
+
 
 def collect_from_payload(
     *,
@@ -159,6 +159,15 @@ def validate_receipt(receipt: dict[str, Any]) -> None:
         raise ValueError("collector receipt freshness state invalid")
     if freshness.get("stale_means_false") is not False or freshness.get("fresh_means_true") is not False:
         raise ValueError("freshness must not be promoted to truth semantics")
+
+    observation = receipt.get("observation")
+    if not isinstance(observation, dict):
+        raise ValueError("feed receipt observation must be an object")
+    supplied_observation = receipt.get("observation_sha256")
+    expected_observation = sha256_value(observation)
+    if supplied_observation != expected_observation:
+        raise ValueError("feed receipt observation SHA-256 mismatch")
+
     supplied = receipt.get("receipt_sha256")
     payload = dict(receipt)
     payload.pop("receipt_sha256", None)

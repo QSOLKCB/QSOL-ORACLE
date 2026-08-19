@@ -1,0 +1,50 @@
+{
+  "protocol": "QSOL-TIMELOCK-ARCHIVE/1",
+  "version": "1.0.0",
+  "subject": "QSOLKCB/QSOL-CONTEXT",
+  "not_before": "2056-08-18T00:00:00+09:30",
+  "publication_clearance_required": true,
+  "exact_source_commit_required": true,
+  "minimum_independent_locations": 3,
+  "location_classes": [
+    {
+      "class": "source-host",
+      "current_candidate": "GitHub or successor repository host",
+      "replaceable": true,
+      "required_receipt": "public repository identity and exact source commit"
+    },
+    {
+      "class": "doi-archive",
+      "current_candidate": "Zenodo or successor DOI-bearing archival repository",
+      "replaceable": true,
+      "required_receipt": "persistent record identifier plus artifact checksums"
+    },
+    {
+      "class": "independent-content-archive",
+      "current_candidate": "Software Heritage or successor independent source archive",
+      "replaceable": true,
+      "required_receipt": "independent archive identifier or content-addressed snapshot identity"
+    },
+    {
+      "class": "content-addressed-mirror",
+      "current_candidate": "platform-neutral content-addressed public mirror",
+      "replaceable": true,
+      "required_receipt": "content digest and public retrieval locator",
+      "optional": true
+    }
+  ],
+  "release_artifacts": [
+    "exact repository source snapshot",
+    "release fingerprint and checksums",
+    "publication-clearance receipt with private details excluded",
+    "executor result receipt with credentials excluded",
+    "human-readable release notes and provenance statement"
+  ],
+  "verification_requirements": [
+    "all public copies bind to the same exact source commit or explicitly equivalent archive payload",
+    "checksums are published independently of provider metadata",
+    "at least three independent location classes succeed before archival plan is considered complete",
+    "failed archive targets do not rewrite or weaken the publication-clearance decision"
+  ],
+  "truth_authority_from_archive_presence": false
+}

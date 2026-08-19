@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/publication-executor.schema.json",
+  "title": "QSOL publication execution plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "executor_id",
+    "platform",
+    "contract_id",
+    "subject",
+    "not_before",
+    "source_commit",
+    "clearance_receipt_sha256",
+    "target_visibility",
+    "dry_run",
+    "current_platform_authority_required",
+    "operator_authority_assertion_is_proof",
+    "credential_source",
+    "credential_persisted",
+    "request",
+    "postcondition",
+    "oracle_execution_authority",
+    "truth_claim"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-PUBLICATION-EXECUTION/1"},
+    "executor_id": {"const": "github-visibility-v1"},
+    "platform": {"const": "github"},
+    "contract_id": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}$"},
+    "not_before": {"type": "string", "format": "date-time"},
+    "source_commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "clearance_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "target_visibility": {"const": "public"},
+    "dry_run": {"const": true},
+    "current_platform_authority_required": {"const": true},
+    "operator_authority_assertion_is_proof": {"const": false},
+    "credential_source": {"const": "runtime-only"},
+    "credential_persisted": {"const": false},
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "endpoint", "body"],
+      "properties": {
+        "method": {"const": "PATCH"},
+        "endpoint": {"type": "string", "pattern": "^https://api\\.github\\.com/repos/[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}$"},
+        "body": {"const": {"visibility": "public"}}
+      }
+    },
+    "postcondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "visibility"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 3},
+        "visibility": {"const": "public"}
+      }
+    },
+    "oracle_execution_authority": {"const": false},
+    "truth_claim": {"const": false}
+  }
+}

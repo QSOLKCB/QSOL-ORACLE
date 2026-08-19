@@ -1,0 +1,38 @@
+{
+  "protocol": "QSOL-ORACLE-ARK-RECOVERY/1",
+  "version": "1.0.0",
+  "subject": "QSOLKCB/QSOL-CONTEXT",
+  "contract_id": "qsol-context-publication-2056",
+  "preservation_target": "QSOLKCB/QSOL-ARK",
+  "purpose": "reconstruct the QSOL-TIMELOCK publication executor after long-term runtime or platform loss",
+  "executor_replaceable": true,
+  "credential_recovery": "never-restore-historic-credentials",
+  "canonical_inputs": [
+    "contracts/qsol-context-2056.json",
+    "contracts/publication-executor-interface.json",
+    "contracts/publication-safety-policy.json",
+    "schema/publication-classification.schema.json",
+    "schema/publication-clearance.schema.json",
+    "schema/publication-executor.schema.json",
+    "tools/timelock.py",
+    "tools/publication_executor.py",
+    "release/2056-archive-plan.json"
+  ],
+  "recovery_steps": [
+    "Verify the recovered QSOL-ORACLE artifact set against a deterministic release fingerprint or independently preserved hashes.",
+    "Re-read the founding QSOL-TIMELOCK/1 contract and confirm no newer authenticated maintainer directive supersedes it.",
+    "Resolve the then-current repository host and obtain a fresh complete local copy of the exact candidate source commit.",
+    "Run the local publication classification scanner and produce a new clearance receipt; any unclassified, permanent-deny, redaction-required, sensitive, or unsafe-symlink result blocks publication.",
+    "Implement or select a current platform adapter conforming to QSOL-PUBLICATION-EXECUTOR-INTERFACE/1; do not restore historical credentials.",
+    "Obtain current platform authorization at execution time and perform a dry run first.",
+    "Execute only when the timelock is eligible, the clearance receipt is cleared, current authority is independently available, and the adapter can verify the postcondition.",
+    "Publish archival copies according to the multi-location plan and retain public receipts without treating archive presence as semantic truth."
+  ],
+  "forbidden_recovery_shortcuts": [
+    "reuse-2056-incompatible-api-assumptions-without-verification",
+    "restore-decades-old-token",
+    "skip-classification-because-deadline-matured",
+    "treat-archive-copy-as-canonical-source-truth",
+    "treat-dry-run-as-execution"
+  ]
+}

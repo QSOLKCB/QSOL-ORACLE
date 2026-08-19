@@ -4,7 +4,7 @@
 
 > **Maximum Truth Mode: enabled.**
 
-QSOL-ORACLE is a public, vendor-neutral witness, attestation, routing, and temporal-contract layer for the QSOL ecosystem. It records what a source was observed to say or contain without promoting that observation into semantic truth.
+QSOL-ORACLE is a public, vendor-neutral witness, attestation, research-continuation, routing, and temporal-contract layer for the QSOL ecosystem. It records what evidence permits without promoting observation, search, signatures, freshness, clearance, or archival presence into semantic truth.
 
 ```text
 QSOL-SUBSTRATE  KNOWS
@@ -13,8 +13,6 @@ QSOL-INT        COMPOSES
 QSOL-ORACLE     WITNESSES
 QSOL-NEXUS      REASONS ACROSS THEM
 ```
-
-The practical rule remains: **ORACLE provides evidence; NEXUS provides understanding.**
 
 ## Constitutional invariants
 
@@ -27,132 +25,130 @@ CHECKPOINT_MATCH != SOURCE_TRUE
 FRESH != TRUE
 STALE != FALSE
 COLLECTED != CANONICAL
+SUGGESTED_SEARCH != EVIDENCE
 UNKNOWN > PLAUSIBLE_GUESS
+CLEARANCE != EXECUTION_AUTHORITY
+DRY_RUN != EXECUTED
+ARCHIVED_COPY != SEMANTIC_AUTHORITY
 ```
 
-## Phase 1: deterministic witness ledger
+## Research continuation
 
-The append-only ledger now supports explicit correction and supersession relationships:
-
-```text
-evidence.correction
-  -> provenance_kind=correction
-  -> target_event_hash=<earlier event>
-  -> target is also in derived_from
-
-evidence.supersession
-  -> provenance_kind=supersession
-  -> target_event_hash=<earlier event>
-  -> target is also in derived_from
-```
-
-History is never rewritten to make the ledger prettier.
-
-### Detached signatures
-
-`QSOL-ORACLE-SIGNATURE/1` binds externally produced signature bytes to exact object bytes. The reference implementation validates the envelope and binding while leaving cryptographic key verification external.
-
-A valid signature is authentication evidence, not a universal truth wand. 🪄
-
-### Checkpoints and release fingerprints
+Phase 4 turns `unknown` into a useful machine state rather than a conversational shrug.
 
 ```bash
-python3 tools/oracle.py checkpoint
-python3 tools/oracle.py fingerprint
+python3 tools/oracle.py research-unknown \
+  --subject QSOLKCB/QSOL-CONTEXT \
+  --question "Is the repository public now?" \
+  --requirement current:current_state:"current visibility has not been directly observed"
 ```
 
-`ledger/checkpoint.json` deterministically binds the current ledger. `release/fingerprint.json` binds the manifest-declared canonical release identity set plus the ledger checkpoint.
+The structured response contains:
 
-## Phase 2: feed collectors
+- classified missing evidence;
+- primary-source targets;
+- suggested discovery searches explicitly labelled **non-evidence**;
+- `answer: null` while evidence is missing; and
+- deterministic envelope identity.
 
-Implemented collectors:
+A plausible completion supplied by a caller is deliberately ignored when required evidence is absent.
 
-- GitHub repository state;
-- GitHub commit;
-- GitHub release;
-- GitHub tag;
-- GitHub Actions validation receipt;
-- Zenodo DOI/publication record;
-- QSOL-SUBSTRATE canonical fingerprint;
-- QSOL-ARK recovery capability; and
-- QSOL-INT compatibility/drift report.
+Conflict bundles preserve incompatible observations without averaging them into synthetic certainty.
 
-Collectors emit `QSOL-ORACLE-FEED/1` receipts. Receipts are observations and **are not automatically admitted to the canonical ledger**.
+See `docs/RESEARCH.md`.
 
-### Freshness
+## Deterministic witness and feeds
 
-Every receipt has explicit freshness semantics: `fresh`, `stale`, `undated`, or `future-dated`.
+The append-only ledger supports correction and supersession events without rewriting prior bytes. Detached signatures remain authentication evidence only. Deterministic checkpoints and release fingerprints bind exact repository artifacts.
+
+Feed collectors cover GitHub repository/commit/release/tag/Actions observations, Zenodo records, QSOL-SUBSTRATE fingerprints, QSOL-ARK recovery capability, and QSOL-INT compatibility/drift receipts. Collector receipts are observations and are **not automatically canonical ledger events**.
+
+See `docs/FEEDS.md`.
+
+## QSOL-CONTEXT 2056 publication safety
+
+The original witnessed contract remains `contracts/qsol-context-2056.json`. Its bytes are not rewritten by the later publication machinery.
+
+The publication path is deliberately layered:
 
 ```text
-FRESH != TRUE
-STALE != FALSE
+founding timelock
+    |
+    v
+locked / eligible evaluation
+    |
+    v
+local classification scan
+    |
+    v
+publication-clearance receipt
+    |
+    |  still no execution authority
+    v
+replaceable platform executor
+    |
+    |  dry-run by default
+    v
+current authorization + runtime credential
+    |
+    v
+platform action + postcondition verification
+    |
+    v
+multi-location archival release
 ```
 
-Freshness measures currency. It does not magically validate the source's claim.
-
-### Offline deterministic CI
+### Local classification scanner
 
 ```bash
-python3 tools/oracle.py collect github.repository --fixture fixtures/collectors.json
-python3 tools/oracle.py collect github.actions --fixture fixtures/collectors.json
-python3 tools/oracle.py collect qsol.substrate --fixture fixtures/collectors.json
-python3 tools/oracle.py collect qsol.ark --fixture fixtures/collectors.json
-python3 tools/oracle.py collect qsol.int --fixture fixtures/collectors.json
+python3 tools/oracle.py scan-publication \
+  --repo /path/to/private/QSOL-CONTEXT \
+  --classification /path/to/classification.json \
+  --subject QSOLKCB/QSOL-CONTEXT \
+  --source-commit <exact-commit>
 ```
 
-The fixture bundle covers all nine collector kinds without network access.
+The scanner fails closed. Unclassified files, permanent-deny material, pending redaction, sensitive-token/key signatures, unsafe symlinks, orphan classification records, or classified-file hash drift block publication clearance.
 
-Live public GitHub and Zenodo API collection is also supported through the Python standard library. See `docs/FEEDS.md`.
+### Publication clearance
+
+```bash
+python3 tools/oracle.py publication-clearance \
+  --scan scan.json \
+  --at 2056-08-18T00:00:00+09:30 \
+  --provenance-passed
+```
+
+A cleared receipt means the declared safety gates passed for that exact scan and time. It **does not grant execution authority**.
+
+### Replaceable executor
+
+```bash
+# Default: no side effects
+python3 tools/oracle.py publish --clearance clearance.json
+
+# Future real execution additionally requires current authorization and a runtime token.
+python3 tools/oracle.py publish \
+  --clearance clearance.json \
+  --execute \
+  --confirm-current-authority
+```
+
+No long-lived credential is stored. GitHub is the current adapter, not an eternal dependency. `contracts/publication-executor-interface.json` defines the future-platform interface.
+
+The recovery procedure is captured in `recovery/ark-timelock-executor.json`, and the 2056 plan requires at least three independent archival location classes. See `docs/PUBLICATION.md` and `docs/TIMELOCK.md`.
 
 ## Validate
 
 ```bash
+python3 -m compileall -q tools tests
 python3 tools/oracle.py validate
 python3 -W default -m unittest discover -s tests -v
 ```
 
-## QSOL-CONTEXT 2056 timelock
-
-The founding temporal contract remains `contracts/qsol-context-2056.json`.
-
-```text
-ELIGIBLE_FOR_PUBLICATION != ALREADY_PUBLIC
-TIME_REACHED != IGNORE_PRIVACY_OR_RIGHTS
-```
-
-The contract stores no thirty-year credential. Future execution requires then-current authorization and every fail-closed publication gate.
-
-## Repository layout
-
-```text
-QSOL-ORACLE/
-├── ai/
-├── contracts/
-├── docs/
-│   └── FEEDS.md
-├── fixtures/
-│   └── collectors.json
-├── ledger/
-│   ├── events.jsonl
-│   └── checkpoint.json
-├── release/
-│   └── fingerprint.json
-├── schema/
-│   ├── oracle-event.schema.json
-│   ├── detached-signature.schema.json
-│   ├── feed-receipt.schema.json
-│   ├── ledger-checkpoint.schema.json
-│   └── release-fingerprint.schema.json
-├── tools/
-│   ├── oracle.py
-│   └── collectors.py
-└── tests/
-    └── test_oracle.py
-```
-
 ## Status
 
-**Roadmap Phases 0, 1, and 2 are implemented.** Phase 3 remains the ORACLE↔NEXUS transport membrane and visible-claim audit layer.
+Roadmap Phases **0, 1, 2, 4, and 5** are implemented. Phase 3 remains the ORACLE↔NEXUS transport/audit membrane, followed by public feed/export work and the hostile truthfulness battery.
 
 ---
 

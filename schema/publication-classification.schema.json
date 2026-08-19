@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/publication-classification.schema.json",
+  "title": "QSOL private-repository publication classification manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "subject", "source_commit", "entries"],
+  "properties": {
+    "protocol": {"const": "QSOL-PUBLICATION-CLASSIFICATION/1"},
+    "subject": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "classification"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "classification": {"enum": ["public", "redact-before-publication", "permanent-deny"]},
+          "sha256": {
+            "anyOf": [
+              {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              {"type": "null"}
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ]
+          }
+        }
+      }
+    }
+  }
+}

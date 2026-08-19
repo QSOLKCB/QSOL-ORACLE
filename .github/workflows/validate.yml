@@ -18,6 +18,8 @@ jobs:
           python-version: '3.12'
       - name: Compile Python
         run: python3 -m compileall -q tools tests
+      - name: Emit deterministic release fingerprint
+        run: python3 tools/oracle.py fingerprint
       - name: Validate ORACLE contracts and ledger
         run: python3 tools/oracle.py validate
       - name: Exercise offline collectors
@@ -26,5 +28,12 @@ jobs:
           python3 tools/oracle.py collect qsol.substrate --fixture fixtures/collectors.json > /tmp/substrate.json
           python3 tools/oracle.py collect qsol.ark --fixture fixtures/collectors.json > /tmp/ark.json
           python3 tools/oracle.py collect qsol.int --fixture fixtures/collectors.json > /tmp/int.json
+      - name: Exercise research continuation
+        run: |
+          python3 tools/oracle.py research-unknown \
+            --subject QSOLKCB/QSOL-CONTEXT \
+            --question 'Is the current state established?' \
+            --requirement current:current_state:'current state has not been directly observed' \
+            > /tmp/unknown.json
       - name: Run regression tests with warnings
         run: python3 -W default -m unittest discover -s tests -v

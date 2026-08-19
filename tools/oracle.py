@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +14,9 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import collectors  # noqa: E402
+import publication_executor  # noqa: E402
+import research  # noqa: E402
+import timelock as publication_timelock  # noqa: E402
 
 LEDGER = ROOT / "ledger" / "events.jsonl"
 CHECKPOINT = ROOT / "ledger" / "checkpoint.json"
@@ -41,6 +44,11 @@ DECLARED_PATH_KEYS = {
     "founding_timelock", "checkpoint", "release_fingerprint", "signature_schema",
     "feed_schema", "checkpoint_schema", "release_fingerprint_schema",
     "collector_tool", "collector_fixture",
+    "research_tool", "timelock_tool", "publication_executor_tool",
+    "research_response_schema", "conflict_bundle_schema",
+    "publication_classification_schema", "publication_clearance_schema",
+    "publication_executor_schema", "publication_executor_contract",
+    "publication_safety_policy", "ark_recovery_instructions", "archive_plan",
 }
 
 
@@ -62,6 +70,21 @@ from oracle_integrity import (
 )
 
 
+classify_missing_evidence = research.classify_missing_evidence
+generate_primary_source_targets = research.generate_primary_source_targets
+generate_suggested_searches = research.generate_suggested_searches
+build_unknown_response = research.build_unknown_response
+validate_unknown_response = research.validate_unknown_response
+build_conflict_bundle = research.build_conflict_bundle
+validate_conflict_bundle = research.validate_conflict_bundle
+
+scan_publication_repository = publication_timelock.scan_repository
+validate_publication_scan = publication_timelock.validate_scan
+build_publication_clearance = publication_timelock.build_clearance_receipt
+validate_publication_clearance = publication_timelock.validate_clearance_receipt
+get_publication_executor = publication_executor.get_executor
+
+
 def validate_manifest(manifest: dict[str, Any], root: Path) -> list[str]:
     import oracle_contracts
     return oracle_contracts.validate_manifest(
@@ -81,12 +104,16 @@ def timelock_state(contract: dict[str, Any], at: datetime) -> str:
 
 
 def unknown_response(missing_evidence: list[str], suggested_searches: list[str]) -> dict[str, Any]:
+    """Legacy minimal unknown response kept for compatibility.
+
+    Phase 4 callers should prefer build_unknown_response().
+    """
     import oracle_contracts
     return oracle_contracts.unknown_response(missing_evidence, suggested_searches)
 
 
 def validate_repository(root: Path = ROOT) -> dict[str, Any]:
-    """Validate repository contracts, ledger integrity, checkpoints, and release identity."""
+    """Validate repository contracts, research boundaries, timelock safety, and release identity."""
     manifest = load_json(root / "manifest.json")
     validate_manifest(manifest, root)
 
@@ -96,10 +123,13 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
     invariants = constitution.get("invariants", [])
     for required in {
         "UNKNOWN > PLAUSIBLE_GUESS",
+        "SUGGESTED_SEARCH != EVIDENCE",
         "SIGNATURE_VALID != CLAIM_TRUE",
         "FRESH != TRUE",
         "STALE != FALSE",
         "COLLECTED != CANONICAL",
+        "CLEARANCE != EXECUTION_AUTHORITY",
+        "DRY_RUN != EXECUTED",
     }:
         if required not in invariants:
             raise ValueError(f"constitution missing invariant: {required}")
@@ -123,6 +153,18 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
             "timelock witness digest mismatch: contract changed without a new witness event"
         )
 
+    executor_interface = load_json(root / manifest["publication_executor_contract"])
+    publication_executor.validate_executor_interface(executor_interface)
+
+    safety_policy = load_json(root / manifest["publication_safety_policy"])
+    publication_timelock.validate_publication_safety_policy(safety_policy, contract)
+
+    recovery = load_json(root / manifest["ark_recovery_instructions"])
+    publication_timelock.validate_recovery_instructions(recovery, contract)
+
+    archive_plan = load_json(root / manifest["archive_plan"])
+    publication_timelock.validate_archive_plan(archive_plan, contract)
+
     checkpoint = load_json(root / manifest["checkpoint"])
     validate_ledger_checkpoint(checkpoint, root / manifest["ledger"])
     fingerprint = load_json(root / manifest["release_fingerprint"])
@@ -138,6 +180,10 @@ def validate_repository(root: Path = ROOT) -> dict[str, Any]:
         "release_fingerprint_sha256": fingerprint["release_fingerprint_sha256"],
         "timelock_contract_sha256": contract_digest,
         "collector_count": len(collectors.COLLECTOR_KINDS),
+        "research_continuation": "implemented",
+        "publication_clearance": "implemented",
+        "publication_executor_default": "dry-run",
+        "archive_location_classes": len(archive_plan["location_classes"]),
     }
 
 

@@ -1,0 +1,31 @@
+{
+  "protocol": "QSOL-PUBLICATION-SAFETY/1",
+  "version": "1.1.0",
+  "subject": "QSOLKCB/QSOL-CONTEXT",
+  "classification_protocol": "QSOL-PUBLICATION-CLASSIFICATION/1",
+  "classifications": [
+    "public",
+    "redact-before-publication",
+    "permanent-deny"
+  ],
+  "default_classification": "unclassified",
+  "fail_closed": true,
+  "gates": [
+    "zero_unclassified_material",
+    "zero_permanent_deny_material",
+    "zero_redaction_required",
+    "zero_sensitive_findings",
+    "zero_unsafe_symlinks",
+    "zero_orphan_classification_entries",
+    "source_commit_matches_head",
+    "working_tree_clean",
+    "complete_git_history",
+    "all_git_refs_scanned"
+  ],
+  "secret_reporting": "detector-id-path-and-git-object-id-only-never-secret-value",
+  "git_metadata_scope": "scan-every-blob-reachable-from-every-local-git-ref; exclude .git storage bytes themselves",
+  "git_ref_scope": "all-local-refs-complete-history-clean-head-bound",
+  "operator_precondition": "synchronize all remote refs and tags locally before scanning; shallow or dirty repositories fail closed",
+  "classification_hash_binding": "optional per-path SHA-256; any reachable historical variant mismatch becomes unclassified",
+  "execution_authority": "separate-from-clearance"
+}

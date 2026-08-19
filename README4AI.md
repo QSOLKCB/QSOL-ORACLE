@@ -6,7 +6,7 @@ Read `manifest.json` first. Structured contracts are authoritative when they con
 
 ```text
 protocol: QSOL-ORACLE/1
-role: witness / attestation / routing / temporal-contract layer
+role: witness / attestation / research-continuation / routing / temporal-contract layer
 semantic_authority: none by default
 reasoning_authority: none
 control_authority_over_nexus: none
@@ -27,9 +27,7 @@ ORACLE is outside the Three Pillars. It may surround NEXUS as an evidentiary mem
 
 ## Hard invariants
 
-Load `ai/constitution.json` and `ai/nexus-boundary.json`.
-
-At minimum preserve:
+Load `ai/constitution.json` and preserve at minimum:
 
 ```text
 OBSERVED != TRUE
@@ -39,12 +37,14 @@ CHECKPOINT_MATCH != SOURCE_TRUE
 FRESH != TRUE
 STALE != FALSE
 COLLECTED != CANONICAL
+SUGGESTED_SEARCH != EVIDENCE
 UNKNOWN > PLAUSIBLE_GUESS
+CLEARANCE != EXECUTION_AUTHORITY
+DRY_RUN != EXECUTED
+ARCHIVED_COPY != SEMANTIC_AUTHORITY
 ```
 
-Do not infer truth from a successful observation. Do not infer authorship from a hash. Do not infer canonical status from archival presence. Do not treat NEXUS reasoning as ORACLE evidence.
-
-## Response states
+## Response states and research continuation
 
 Use exactly these conceptual states when answering from ORACLE evidence:
 
@@ -52,101 +52,131 @@ Use exactly these conceptual states when answering from ORACLE evidence:
 - `conflict`: relevant evidence materially disagrees;
 - `unknown`: available evidence cannot establish the answer.
 
-For `unknown`, preserve uncertainty and return bounded `suggested_searches` or primary-source targets. Suggested searches are research hints, not evidence.
+Phase 4 implementation is `tools/research.py`.
 
-## Ledger
+### Structured unknown
 
-`ledger/events.jsonl` is a **single-writer append-only** hash-linked ledger. File order is canonical order and `sequence` equals the zero-based file position.
-
-`event_hash` is SHA-256 of canonical JSON for the record with `event_hash` omitted, using UTF-8, sorted keys, and compact separators.
-
-Every event declares one `provenance_kind`:
+`build_unknown_response` consumes **explicit structured evidence requirements**. The classifier does not invent a likely requirement set from prose. If any required evidence is absent, the envelope uses:
 
 ```text
-primary_observation
-derived_statement
-correction
-supersession
-metadata
-```
-
-`derived_statement`, `correction`, and `supersession` require `derived_from` references to earlier canonical event hashes.
-
-Corrections use `event_type=evidence.correction`. Supersessions use `event_type=evidence.supersession`. Both require `target_event_hash`, and that target must also appear in `derived_from`. Earlier history remains intact.
-
-A valid chain establishes deterministic ledger integrity only. It does not establish semantic truth, authorship, endorsement, or scientific validity.
-
-## Detached signatures
-
-`schema/detached-signature.schema.json` defines `QSOL-ORACLE-SIGNATURE/1`.
-
-The reference tool binds externally produced signature bytes to an exact object SHA-256. Cryptographic key verification is deliberately external. The envelope always carries:
-
-```text
-authority = authentication-evidence-only
+protocol = QSOL-ORACLE-RESEARCH/1
+state = unknown
+answer = null
+plausible_completion_used = false
+plausible_completion_allowed = false
 truth_claim = false
 ```
 
-Example:
+Missing-evidence classes map to bounded primary-source targets. Suggested searches are generated from those targets but remain `discovery-only`, `is_evidence=false`, and inadmissible as evidence until a source is actually observed.
 
-```bash
-python3 tools/oracle.py signature-envelope \
-  --object release/fingerprint.json \
-  --signature release/fingerprint.sig \
-  --kind release-fingerprint \
-  --id local-release \
-  --algorithm ed25519 \
-  --key-id did:key:example
+### Conflict bundle
+
+`QSOL-ORACLE-CONFLICT/1` requires two or more materially incompatible values. Preserve each source-linked observation and set:
+
+```text
+resolution = unresolved
+consensus_value = null
+averaging_forbidden = true
+truth_claim = false
 ```
 
-## Checkpoints and release identity
+Do not convert disagreement into a majority vote or guessed compromise.
 
-```bash
-python3 tools/oracle.py checkpoint
-python3 tools/oracle.py fingerprint
-```
+## Ledger and signatures
 
-`ledger/checkpoint.json` binds exact ledger bytes, event count, ledger head, and event-hash sequence.
+`ledger/events.jsonl` is a single-writer append-only hash-linked ledger. Corrections and supersessions are new events referencing earlier canonical hashes. Earlier bytes remain intact.
 
-`release/fingerprint.json` binds the manifest-declared release identity set plus the current ledger checkpoint. These are integrity artifacts, not source-truth artifacts.
+Detached signatures bind externally produced signature bytes to exact object identity. Cryptographic key verification remains external, and a valid signature is not semantic truth.
 
 ## Feed collectors
 
-Collectors emit deterministic `QSOL-ORACLE-FEED/1` observation receipts. They do **not** append to the ledger automatically.
-
-Implemented kinds:
-
-```text
-github.repository
-github.commit
-github.release
-github.tag
-github.actions
-zenodo.record
-qsol.substrate
-qsol.ark
-qsol.int
-```
+Collectors emit deterministic `QSOL-ORACLE-FEED/1` observation receipts. They do **not** append to the ledger automatically. Freshness describes currency, not truth.
 
 See `docs/FEEDS.md`.
 
-Offline CI:
+## QSOL-TIMELOCK publication pipeline
 
-```bash
-python3 tools/oracle.py collect github.repository --fixture fixtures/collectors.json
-python3 tools/oracle.py collect qsol.int --fixture fixtures/collectors.json
+The founding `contracts/qsol-context-2056.json` is already hash-witnessed. Do not silently rewrite it to add later implementation detail.
+
+Phase 5 adds separate machine contracts and tools around that founding intent:
+
+```text
+contracts/publication-safety-policy.json
+contracts/publication-executor-interface.json
+schema/publication-classification.schema.json
+schema/publication-clearance.schema.json
+schema/publication-executor.schema.json
+tools/timelock.py
+tools/publication_executor.py
+recovery/ark-timelock-executor.json
+release/2056-archive-plan.json
 ```
 
-Freshness states are `fresh`, `stale`, `undated`, and `future-dated`. Freshness describes currency, not truth.
+### Classification scanner
 
-## Temporal contract
+`tools/timelock.py` scans a **local** candidate repository. It does not upload private bytes.
 
-`contracts/qsol-context-2056.json` records the QSOL-CONTEXT publication directive.
+The scanner is fail-closed:
 
-`eligible != executed`.
+```text
+missing classification -> unclassified -> block
+classification SHA mismatch -> unclassified -> block
+permanent-deny -> block
+redact-before-publication -> block
+sensitive finding -> block
+unsafe symlink -> block
+orphan classification entry -> block
+```
 
-Do not bypass publication clearance, permanent-deny, unclassified-material, authorization, or platform checks merely because the time condition has matured.
+Sensitive findings report detector IDs and paths only. Suspected secret values must not be copied into public reports.
+
+### Publication clearance
+
+A `QSOL-PUBLICATION-CLEARANCE/1` receipt binds the exact scan, source commit, evaluation time, timelock state, and safety gates.
+
+Even when `clearance_state=cleared`:
+
+```text
+execution_authority_included = false
+execution_authorized = false
+```
+
+Deadline maturity and publication clearance therefore remain separate from execution authority.
+
+### Publication executor
+
+`tools/publication_executor.py` implements a replaceable adapter interface. GitHub is the current concrete adapter.
+
+Every execution plan defaults to:
+
+```text
+dry_run = true
+credential_source = runtime-only
+credential_persisted = false
+current_platform_authority_required = true
+oracle_execution_authority = false
+```
+
+Real execution requires an eligible cleared receipt, explicit current authority confirmation, a runtime credential, platform preflight, and postcondition verification. Never reconstruct or persist a decades-old credential.
+
+If the platform changes by 2056, replace the adapter under `QSOL-PUBLICATION-EXECUTOR-INTERFACE/1`. Do not weaken the founding timelock or safety gates.
+
+### Recovery and archival release
+
+`recovery/ark-timelock-executor.json` is the recovery recipe intended for preservation with QSOL-ARK. It reconstructs procedure and contracts, never historic credentials.
+
+`release/2056-archive-plan.json` requires at least three independent public preservation location classes after publication clearance. Archive presence is preservation evidence, not semantic authority.
+
+## Temporal rule
+
+```text
+eligible != executed
+TIME_REACHED != SAFE_TO_PUBLISH
+CLEARANCE != EXECUTION_AUTHORITY
+```
+
+Do not bypass publication clearance, permanent-deny, unclassified-material, authorization, provenance, or platform checks merely because the time condition has matured.
 
 ## NEXUS
 
-ORACLE may provide evidence feeds and receipts to NEXUS and may check whether NEXUS output exceeds cited evidence. ORACLE must never expose or request hidden chain-of-thought. Audit visible claims and explicit evidence only.
+ORACLE may provide evidence feeds and receipts to NEXUS and may check whether visible NEXUS output exceeds cited evidence. ORACLE must never expose or request hidden chain-of-thought.

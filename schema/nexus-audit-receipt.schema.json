@@ -12,11 +12,26 @@
   ],
   "properties": {
     "protocol": {"const": "QSOL-ORACLE-NEXUS-AUDIT/1"},
-    "response_id": {"type": "string", "minLength": 1},
+    "response_id": {"type": "string", "minLength": 1, "maxLength": 256},
     "scope": {"const": "visible-claims-and-explicit-evidence-only"},
-    "claim_results": {"type": "array"},
-    "findings": {"type": "array", "uniqueItems": true},
-    "status": {"enum": ["supported", "attention"]},
+    "claim_results": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "presentation", "evidence_refs", "findings", "structurally_consistent"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1, "maxLength": 128},
+          "presentation": {"enum": ["fact", "inference", "unknown", "conflict"]},
+          "evidence_refs": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+          "findings": {"type": "array", "uniqueItems": true, "items": {"enum": ["citation_support", "claim_exceeds_evidence", "inference_presented_as_fact", "conflict_suppressed", "unknown_suppressed"]}},
+          "structurally_consistent": {"type": "boolean"}
+        }
+      }
+    },
+    "findings": {"type": "array", "uniqueItems": true, "items": {"enum": ["citation_support", "claim_exceeds_evidence", "inference_presented_as_fact", "conflict_suppressed", "unknown_suppressed"]}},
+    "status": {"enum": ["no-structural-objection", "attention"]},
     "hidden_reasoning_examined": {"const": false},
     "hidden_reasoning_required": {"const": false},
     "nexus_output_modified": {"const": false},

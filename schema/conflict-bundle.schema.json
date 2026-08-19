@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/conflict-bundle.schema.json",
+  "title": "QSOL-ORACLE Conflict Bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "state",
+    "subject",
+    "dimension",
+    "observations",
+    "distinct_value_sha256",
+    "resolution",
+    "consensus_value",
+    "averaging_forbidden",
+    "truth_claim",
+    "bundle_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-CONFLICT/1"},
+    "state": {"const": "conflict"},
+    "subject": {"type": "string", "minLength": 1},
+    "dimension": {"type": "string", "minLength": 1},
+    "observations": {"type": "array", "minItems": 2, "items": {"type": "object"}},
+    "distinct_value_sha256": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "resolution": {"const": "unresolved"},
+    "consensus_value": {"type": "null"},
+    "averaging_forbidden": {"const": true},
+    "truth_claim": {"const": false},
+    "bundle_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

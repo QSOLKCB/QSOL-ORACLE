@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-claim-audit.schema.json",
+  "title": "QSOL-ORACLE Visible Claim Audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["response_id", "visible_claims", "hidden_reasoning_provided"],
+  "properties": {
+    "response_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "hidden_reasoning_provided": {"const": false},
+    "visible_claims": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "text", "presentation", "evidence_refs"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1, "maxLength": 128},
+          "text": {"type": "string", "minLength": 1, "maxLength": 16384},
+          "presentation": {"enum": ["fact", "inference", "unknown", "conflict"]},
+          "evidence_refs": {
+            "type": "array",
+            "maxItems": 256,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    }
+  }
+}

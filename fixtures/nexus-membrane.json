@@ -1,0 +1,30 @@
+{
+  "protocol": "QSOL-ORACLE-NEXUS-FIXTURE/1",
+  "source_basis": {
+    "repository": "QSOLKCB/QSOL-NEXUS",
+    "commit": "7b8feee0325581f3daff66ebdb3c82347835a868",
+    "machine_manifest": "README4AI.md",
+    "stenographer_implementation": "src/nexus_runtime/stenographer.py"
+  },
+  "nexus_stenographer": {
+    "native_schema": "nexus-stenographer/1",
+    "native_record_scope": "ai_actions_only",
+    "authority": "zero",
+    "failure_mode": "fail-passive with visible completeness gap",
+    "oracle_view_is_native_record": false,
+    "oracle_view_append_to_native_ledger": false
+  },
+  "authority_expectations": {
+    "oracle_vote_authority": false,
+    "oracle_council_seat": false,
+    "oracle_worldstore_mutation_authority": false,
+    "oracle_governance_authority": false,
+    "oracle_output_mutation_authority": false,
+    "hidden_chain_of_thought_capture": false
+  },
+  "transport": {
+    "protocol": "QSOL-ORACLE-NEXUS/1",
+    "nexus_to_oracle": ["evidence_query", "visible_claim_audit"],
+    "oracle_to_nexus": ["evidence_result", "stenographer_event_view", "claim_audit_receipt"]
+  }
+}

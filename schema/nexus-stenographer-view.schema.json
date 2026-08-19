@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-stenographer-view.schema.json",
+  "title": "QSOL-ORACLE Stenographer-Compatible Event View",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol", "view_type", "event_hash", "sequence", "subject", "event_type",
+    "observed_at", "source", "provenance_kind", "evidence", "authority", "truth_claim",
+    "hidden_reasoning_included", "nexus_stenographer", "view_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-STENOGRAPHER-VIEW/1"},
+    "view_type": {"const": "oracle_witness_event"},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sequence": {"type": "integer", "minimum": 0},
+    "subject": {"type": "string", "minLength": 1},
+    "event_type": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source": {"type": "object"},
+    "provenance_kind": {"type": "string", "minLength": 1},
+    "evidence": {"type": "object"},
+    "authority": {"const": "presentation-only"},
+    "truth_claim": {"const": false},
+    "hidden_reasoning_included": {"const": false},
+    "nexus_stenographer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_surface", "native_schema", "native_record", "native_record_scope", "external_view_scope", "append_to_native_stenographer_ledger", "read_only"],
+      "properties": {
+        "target_surface": {"const": "Courtroom Stenographer"},
+        "native_schema": {"const": "nexus-stenographer/1"},
+        "native_record": {"const": false},
+        "native_record_scope": {"const": "ai_actions_only"},
+        "external_view_scope": {"const": "oracle_evidence"},
+        "append_to_native_stenographer_ledger": {"const": false},
+        "read_only": {"const": true}
+      }
+    },
+    "view_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

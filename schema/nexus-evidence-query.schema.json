@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-evidence-query.schema.json",
+  "title": "QSOL-ORACLE NEXUS Evidence Query Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "subject": {"type": "string", "minLength": 1, "maxLength": 512},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "event_type": {"type": "string", "minLength": 1, "maxLength": 512},
+    "provenance_kind": {"type": "string", "minLength": 1, "maxLength": 512},
+    "evidence_state": {"type": "string", "minLength": 1, "maxLength": 512},
+    "limit": {"type": "integer", "minimum": 1, "maximum": 1000}
+  }
+}

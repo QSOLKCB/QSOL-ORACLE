@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-audit-receipt.schema.json",
+  "title": "QSOL-ORACLE Visible Claim Audit Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol", "response_id", "scope", "claim_results", "findings", "status",
+    "hidden_reasoning_examined", "hidden_reasoning_required",
+    "nexus_output_modified", "nexus_output_blocked", "worldstore_mutated",
+    "governance_action_taken", "truth_claim", "authority", "audit_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-NEXUS-AUDIT/1"},
+    "response_id": {"type": "string", "minLength": 1},
+    "scope": {"const": "visible-claims-and-explicit-evidence-only"},
+    "claim_results": {"type": "array"},
+    "findings": {"type": "array", "uniqueItems": true},
+    "status": {"enum": ["supported", "attention"]},
+    "hidden_reasoning_examined": {"const": false},
+    "hidden_reasoning_required": {"const": false},
+    "nexus_output_modified": {"const": false},
+    "nexus_output_blocked": {"const": false},
+    "worldstore_mutated": {"const": false},
+    "governance_action_taken": {"const": false},
+    "truth_claim": {"const": false},
+    "authority": {"const": "audit-only"},
+    "audit_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

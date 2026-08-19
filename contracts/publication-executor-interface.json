@@ -1,6 +1,6 @@
 {
   "protocol": "QSOL-PUBLICATION-EXECUTOR-INTERFACE/1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "purpose": "replaceable platform adapter contract for QSOL-TIMELOCK publication execution",
   "required_semantics": [
     "dry_run_default",
@@ -8,17 +8,22 @@
     "current_authority_required",
     "fail_closed",
     "postcondition_verification",
-    "replaceable_adapter"
+    "replaceable_adapter",
+    "validated_clearance_recheck",
+    "trusted_runtime_time_recheck",
+    "subject_endpoint_binding",
+    "plan_rederived_at_execution"
   ],
   "adapter_contract": {
-    "plan": "produce a side-effect-free execution plan bound to a cleared publication receipt",
-    "execute": "perform a platform action only after explicit current authority and runtime credentials are supplied",
+    "plan": "produce a side-effect-free execution plan bound to a structurally validated cleared publication receipt",
+    "execute": "rederive and compare the plan, revalidate the contract and clearance, recheck the current trusted runtime clock, then perform a platform action only after explicit current authority and runtime credentials are supplied",
     "observe_postcondition": "verify the platform-reported target state after action"
   },
   "credential_policy": {
     "persistence": "forbidden",
     "source": "runtime-only",
-    "historic_credential_recovery": "forbidden"
+    "historic_credential_recovery": "forbidden",
+    "endpoint_binding": "runtime credentials may only be sent to the endpoint deterministically derived from the validated subject"
   },
   "oracle_has_execution_authority": false,
   "platform_is_semantic_authority": false,

@@ -19,14 +19,23 @@ Preserve evidence boundaries before producing convenient answers.
 - Never make ORACLE a composition authority over QSOL-INT.
 - Never make ORACLE a reasoning/governance authority over QSOL-NEXUS.
 - Never turn a witnessed event into a factual endorsement merely because it is recorded.
-- Never turn a successful workflow, valid signature, matching hash, fresh timestamp, DOI, or archive presence into semantic truth.
-- Never turn a suggested search into evidence.
+- Never turn a successful workflow, valid signature, matching hash, fresh timestamp, DOI, archive presence, clearance receipt, or dry run into semantic truth.
+- Never turn a suggested search or primary-source target into evidence.
 
-## Unknown handling
+## Unknown and research-continuation rules
 
-If evidence is insufficient, prefer an explicit `unknown` result. Include missing evidence and useful search targets when possible.
+When evidence is insufficient, prefer the structured `unknown` envelope from `tools/research.py`.
 
-Do not reward rhetorical confidence. Do not fabricate a complete answer to avoid saying `unknown`.
+```text
+UNKNOWN > PLAUSIBLE_GUESS
+SUGGESTED_SEARCH != EVIDENCE
+```
+
+Missing-evidence classification is structural: callers declare explicit evidence requirements. Do not infer a convenient requirement set from rhetoric in order to manufacture an answer.
+
+Primary-source targets and suggested searches are discovery aids only. They become evidence only after a source is actually observed through an admissible evidence path.
+
+Conflict bundles preserve incompatible observations. Do not average, vote, rank by rhetorical confidence, or invent a consensus value.
 
 ## Ledger rules
 
@@ -70,6 +79,35 @@ Prefer native parent artifacts for QSOL-SUBSTRATE, QSOL-ARK, and QSOL-INT. Do no
 
 Offline fixture mode must remain network-free and deterministic.
 
+## QSOL-TIMELOCK publication rules
+
+The founding `contracts/qsol-context-2056.json` bytes are already witnessed. Do not mutate that historic contract in place. New safety and executor contracts surround it.
+
+```text
+TIME_REACHED != SAFE_TO_PUBLISH
+CLEARANCE != EXECUTION_AUTHORITY
+DRY_RUN != EXECUTED
+```
+
+The local classification scanner is fail-closed:
+
+- missing classification means `unclassified`;
+- hash drift in a classified file means `unclassified`;
+- `permanent-deny`, `redact-before-publication`, sensitive findings, unsafe symlinks, or orphan classification entries block clearance;
+- scanner reports must not emit suspected secret values.
+
+A publication-clearance receipt never grants execution authority. The GitHub executor defaults to dry-run. Real execution requires a cleared eligible receipt, explicit current authority confirmation, a runtime credential, platform preflight, and postcondition verification.
+
+Never persist a credential for future execution. Never reconstruct a decades-old token from ARK or any other archive.
+
+Executors are replaceable. If GitHub is no longer suitable, implement the versioned future-platform interface instead of weakening the timelock contract.
+
+## ARK recovery and archival preservation
+
+`recovery/ark-timelock-executor.json` is the machine recovery recipe intended for preservation with QSOL-ARK. Recovery restores contracts and procedure, never historic credentials.
+
+`release/2056-archive-plan.json` requires multiple independent public preservation locations after clearance. Archive presence remains preservation evidence, not semantic authority.
+
 ## Deterministic release identity
 
 Regenerate and validate after changing any `manifest.release_fingerprint_paths` input:
@@ -86,9 +124,3 @@ Committed checkpoint and fingerprint files must match the exact repository bytes
 ## NEXUS boundary
 
 Audit only visible inputs, outputs, citations, receipts, and explicit evidence. Do not request, persist, reconstruct, or claim access to hidden chain-of-thought.
-
-## Timelock rules
-
-Never store a credential intended to survive until 2056. Executors are replaceable. The temporal contract is platform-neutral and fail-closed.
-
-A matured clock creates `eligible`, not `executed`.

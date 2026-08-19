@@ -1,0 +1,74 @@
+{
+  "type": "qsol-oracle-nexus-membrane",
+  "protocol": "QSOL-ORACLE-NEXUS/1",
+  "version": "1.0.0",
+  "relationship": "evidentiary-membrane",
+  "oracle_role": "WITNESSES",
+  "nexus_role": "REASONS",
+  "operations": [
+    "evidence.query",
+    "event.view",
+    "visible_claim.audit"
+  ],
+  "directions": {
+    "nexus-to-oracle": [
+      "evidence_query",
+      "visible_claim_audit"
+    ],
+    "oracle-to-nexus": [
+      "evidence_result",
+      "stenographer_event_view",
+      "claim_audit_receipt"
+    ]
+  },
+  "authority_firewall": {
+    "oracle_council_seat": false,
+    "oracle_vote_authority": false,
+    "oracle_worldstore_mutation_authority": false,
+    "oracle_governance_authority": false,
+    "oracle_output_mutation_authority": false
+  },
+  "hidden_chain_of_thought": {
+    "accepted": false,
+    "requested": false,
+    "persisted": false,
+    "reconstructed": false,
+    "audit_scope": "visible-claims-and-explicit-evidence-only"
+  },
+  "stenographer_bridge": {
+    "target": "QSOL-NEXUS Courtroom Stenographer",
+    "observed_native_schema": "nexus-stenographer/1",
+    "native_record_scope": "ai_actions_only",
+    "oracle_view_scope": "external_evidence",
+    "append_oracle_views_to_native_ledger": false,
+    "presentation_authority": "presentation-only",
+    "failure_semantics": "fail-passive-with-visible-completeness-gap"
+  },
+  "query_semantics": {
+    "matching": "exact-structured-fields-only",
+    "mutation": false,
+    "semantic_truth_from_match": false,
+    "maximum_limit": 1000
+  },
+  "claim_audit": {
+    "input": "visible_claims_plus_explicit_event_hashes",
+    "findings": [
+      "citation_support",
+      "claim_exceeds_evidence",
+      "inference_presented_as_fact",
+      "conflict_suppressed",
+      "unknown_suppressed"
+    ],
+    "blocks_nexus_output": false,
+    "mutates_nexus_output": false,
+    "governs_nexus": false
+  },
+  "source_observation": {
+    "repository": "QSOLKCB/QSOL-NEXUS",
+    "commit": "7b8feee0325581f3daff66ebdb3c82347835a868",
+    "path": "src/nexus_runtime/stenographer.py",
+    "native_schema": "nexus-stenographer/1",
+    "authority": "zero",
+    "record_scope": "ai_actions_only"
+  }
+}

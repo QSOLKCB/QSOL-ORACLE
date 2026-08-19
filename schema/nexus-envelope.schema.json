@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-envelope.schema.json",
+  "title": "QSOL-ORACLE ↔ QSOL-NEXUS Transport Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol", "direction", "kind", "request_id", "payload", "authority",
+    "hidden_reasoning_included", "worldstore_mutation_authorized",
+    "council_vote_authority", "governance_authority",
+    "output_mutation_authorized", "envelope_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-NEXUS/1"},
+    "direction": {"enum": ["nexus-to-oracle", "oracle-to-nexus"]},
+    "kind": {"enum": ["evidence_query", "visible_claim_audit", "evidence_result", "claim_audit_receipt", "stenographer_event_view"]},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "payload": {"type": "object"},
+    "authority": {"enum": ["evidence-query-only", "evidence-delivery-only", "visible-claim-audit-only", "presentation-only"]},
+    "hidden_reasoning_included": {"const": false},
+    "worldstore_mutation_authorized": {"const": false},
+    "council_vote_authority": {"const": false},
+    "governance_authority": {"const": false},
+    "output_mutation_authorized": {"const": false},
+    "envelope_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

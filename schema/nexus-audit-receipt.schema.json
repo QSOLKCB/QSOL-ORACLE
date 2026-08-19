@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/nexus-audit-receipt.schema.json",
+  "title": "QSOL-ORACLE Visible Claim Audit Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol", "response_id", "scope", "claim_results", "findings", "status",
+    "hidden_reasoning_examined", "hidden_reasoning_required",
+    "nexus_output_modified", "nexus_output_blocked", "worldstore_mutated",
+    "governance_action_taken", "truth_claim", "authority", "audit_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-NEXUS-AUDIT/1"},
+    "response_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "scope": {"const": "visible-claims-and-explicit-evidence-only"},
+    "claim_results": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "presentation", "evidence_refs", "findings", "structurally_consistent"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1, "maxLength": 128},
+          "presentation": {"enum": ["fact", "inference", "unknown", "conflict"]},
+          "evidence_refs": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+          "findings": {"type": "array", "uniqueItems": true, "items": {"enum": ["citation_support", "claim_exceeds_evidence", "inference_presented_as_fact", "conflict_suppressed", "unknown_suppressed"]}},
+          "structurally_consistent": {"type": "boolean"}
+        }
+      }
+    },
+    "findings": {"type": "array", "uniqueItems": true, "items": {"enum": ["citation_support", "claim_exceeds_evidence", "inference_presented_as_fact", "conflict_suppressed", "unknown_suppressed"]}},
+    "status": {"enum": ["no-structural-objection", "attention"]},
+    "hidden_reasoning_examined": {"const": false},
+    "hidden_reasoning_required": {"const": false},
+    "nexus_output_modified": {"const": false},
+    "nexus_output_blocked": {"const": false},
+    "worldstore_mutated": {"const": false},
+    "governance_action_taken": {"const": false},
+    "truth_claim": {"const": false},
+    "authority": {"const": "audit-only"},
+    "audit_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

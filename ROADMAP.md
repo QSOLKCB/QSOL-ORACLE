@@ -35,13 +35,13 @@
 
 ## Phase 3 — QSOL-NEXUS membrane
 
-- [ ] Define versioned ORACLE↔NEXUS transport envelopes.
-- [ ] Add NEXUS evidence query operations.
-- [ ] Add Stenographer-compatible ORACLE event view.
-- [ ] Add visible-claim audit receipts around NEXUS responses.
-- [ ] Preserve hidden-chain-of-thought prohibition.
-- [ ] Ensure ORACLE cannot vote, govern, mutate WorldStore, or gain Council authority.
-- [ ] Add adversarial tests for evidence-to-reasoning authority leakage.
+- [x] Define versioned ORACLE↔NEXUS transport envelopes.
+- [x] Add NEXUS evidence query operations.
+- [x] Add Stenographer-compatible ORACLE event view.
+- [x] Add visible-claim audit receipts around NEXUS responses.
+- [x] Preserve hidden-chain-of-thought prohibition.
+- [x] Ensure ORACLE cannot vote, govern, mutate WorldStore, or gain Council authority.
+- [x] Add adversarial tests for evidence-to-reasoning authority leakage.
 
 ## Phase 4 — Research continuation
 

@@ -1,0 +1,45 @@
+name: validate-oracle-nexus-membrane
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  membrane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile membrane modules
+        run: python3 -m compileall -q tools/nexus_*.py tests/test_nexus_*.py
+      - name: Validate membrane contract
+        run: python3 tools/nexus_membrane.py validate
+      - name: Exercise exact evidence query
+        run: |
+          python3 tools/nexus_membrane.py query \
+            --request-id ci-query \
+            --subject QSOLKCB/QSOL-CONTEXT \
+            > /tmp/nexus-query.json
+      - name: Exercise external Stenographer view
+        run: |
+          python3 tools/nexus_membrane.py view \
+            --request-id ci-view \
+            --event-hash 80468db2bf709982ce4eead9de02ba088306fd365dc999f860139e51987ed8ad \
+            > /tmp/nexus-view.json
+      - name: Exercise visible-claim audit
+        run: |
+          cat > /tmp/visible-claims.json <<'JSON'
+          {"response_id":"ci-response","visible_claims":[{"claim_id":"c1","text":"ORACLE witnessed the timelock directive.","presentation":"fact","evidence_refs":["80468db2bf709982ce4eead9de02ba088306fd365dc999f860139e51987ed8ad"]}]}
+          JSON
+          python3 tools/nexus_membrane.py audit \
+            --request-id ci-audit \
+            --input /tmp/visible-claims.json \
+            > /tmp/nexus-audit.json
+      - name: Run membrane adversarial tests
+        run: python3 -W default -m unittest discover -s tests -p 'test_nexus_*.py' -v

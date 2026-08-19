@@ -45,12 +45,12 @@
 
 ## Phase 4 — Research continuation
 
-- [ ] Structured `unknown` response envelope.
-- [ ] Missing-evidence classifier.
-- [ ] Primary-source-target generator.
-- [ ] Suggested-search generator with explicit non-evidence labelling.
-- [ ] Conflict bundles preserving incompatible observations.
-- [ ] Tests ensuring ORACLE prefers `unknown` to plausible invention.
+- [x] Structured `unknown` response envelope.
+- [x] Missing-evidence classifier.
+- [x] Primary-source-target generator.
+- [x] Suggested-search generator with explicit non-evidence labelling.
+- [x] Conflict bundles preserving incompatible observations.
+- [x] Tests ensuring ORACLE prefers `unknown` to plausible invention.
 
 ## Phase 5 — QSOL-TIMELOCK/1
 
@@ -58,13 +58,13 @@
 - [x] Implement deterministic `locked`/`eligible` evaluation.
 - [x] Separate deadline maturity from execution authority.
 - [x] Forbid 30-year stored credentials.
-- [ ] Define publication-clearance receipt schema.
-- [ ] Add local private-repository classification scanner.
-- [ ] Add permanent-deny and unclassified-material gates.
-- [ ] Add replaceable GitHub publication executor with dry-run default.
-- [ ] Add future-platform executor interface.
-- [ ] Add ARK-preserved executor recovery instructions.
-- [ ] Add multi-location public archival release plan for 2056.
+- [x] Define publication-clearance receipt schema.
+- [x] Add local private-repository classification scanner.
+- [x] Add permanent-deny and unclassified-material gates.
+- [x] Add replaceable GitHub publication executor with dry-run default.
+- [x] Add future-platform executor interface.
+- [x] Add ARK-preserved executor recovery instructions.
+- [x] Add multi-location public archival release plan for 2056.
 
 ## Phase 6 — Public feeds and receipts
 

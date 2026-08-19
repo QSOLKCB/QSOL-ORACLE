@@ -1,0 +1,25 @@
+{
+  "protocol": "QSOL-PUBLICATION-SAFETY/1",
+  "version": "1.0.0",
+  "subject": "QSOLKCB/QSOL-CONTEXT",
+  "classification_protocol": "QSOL-PUBLICATION-CLASSIFICATION/1",
+  "classifications": [
+    "public",
+    "redact-before-publication",
+    "permanent-deny"
+  ],
+  "default_classification": "unclassified",
+  "fail_closed": true,
+  "gates": [
+    "zero_unclassified_material",
+    "zero_permanent_deny_material",
+    "zero_redaction_required",
+    "zero_sensitive_findings",
+    "zero_unsafe_symlinks",
+    "zero_orphan_classification_entries"
+  ],
+  "secret_reporting": "detector-id-and-path-only-never-secret-value",
+  "git_metadata_scope": "exclude-.git-internal-storage-from-publication-payload-scan",
+  "classification_hash_binding": "optional per-file SHA-256; mismatch becomes unclassified",
+  "execution_authority": "separate-from-clearance"
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qsol.example/schema/publication-clearance.schema.json",
+  "title": "QSOL publication-clearance receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "contract_id",
+    "subject",
+    "source_commit",
+    "evaluated_at",
+    "timelock_state",
+    "classification_scan_sha256",
+    "gates",
+    "clearance_state",
+    "execution_authority_included",
+    "execution_authorized",
+    "authority",
+    "truth_claim",
+    "receipt_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-PUBLICATION-CLEARANCE/1"},
+    "contract_id": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "timelock_state": {"enum": ["locked", "eligible"]},
+    "classification_scan_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gates": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "boolean"}},
+    "clearance_state": {"enum": ["cleared", "blocked"]},
+    "execution_authority_included": {"const": false},
+    "execution_authorized": {"const": false},
+    "authority": {"const": "publication-clearance-only"},
+    "truth_claim": {"const": false},
+    "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

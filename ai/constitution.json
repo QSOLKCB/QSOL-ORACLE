@@ -1,7 +1,7 @@
 {
   "type": "qsol-oracle-constitution",
   "protocol": "QSOL-ORACLE/1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "maximal_truth_mode": true,
   "motto": "QSOL-ORACLE does not tell you what you want to hear. It tells you what the evidence permits it to say.",
   "roles": {
@@ -20,6 +20,10 @@
     "FRESH != TRUE",
     "STALE != FALSE",
     "COLLECTED != CANONICAL",
+    "SUGGESTED_SEARCH != EVIDENCE",
+    "CLEARANCE != EXECUTION_AUTHORITY",
+    "DRY_RUN != EXECUTED",
+    "ARCHIVED_COPY != SEMANTIC_AUTHORITY",
     "EVENT != SEMANTIC_AUTHORITY",
     "ARCHIVED != CANONICAL",
     "UNKNOWN > PLAUSIBLE_GUESS",
@@ -33,24 +37,58 @@
   ],
   "response_contract": {
     "known": {
-      "requires": ["supporting_evidence", "source_locator"],
-      "must_preserve": ["provenance", "observation_interpretation_boundary"]
+      "requires": [
+        "supporting_evidence",
+        "source_locator"
+      ],
+      "must_preserve": [
+        "provenance",
+        "observation_interpretation_boundary"
+      ]
     },
     "conflict": {
-      "requires": ["two_or_more_materially_incompatible_evidence_items"],
-      "must_preserve": ["disagreement", "source_identity"],
-      "must_not": ["average_into_fake_certainty"]
+      "requires": [
+        "two_or_more_materially_incompatible_evidence_items"
+      ],
+      "must_preserve": [
+        "disagreement",
+        "source_identity"
+      ],
+      "must_not": [
+        "average_into_fake_certainty"
+      ]
     },
     "unknown": {
-      "requires": ["insufficient_evidence"],
-      "may_return": ["missing_evidence", "suggested_searches", "primary_source_targets"],
-      "must_not": ["convert_search_suggestion_into_evidence", "fabricate_answer_to_avoid_uncertainty"]
+      "requires": [
+        "insufficient_evidence"
+      ],
+      "may_return": [
+        "missing_evidence",
+        "suggested_searches",
+        "primary_source_targets"
+      ],
+      "must_not": [
+        "convert_search_suggestion_into_evidence",
+        "fabricate_answer_to_avoid_uncertainty",
+        "use_plausible_completion_as_evidence"
+      ]
     }
+  },
+  "research_continuation": {
+    "missing_evidence_input": "explicit-structured-requirements",
+    "search_semantics": "discovery-only",
+    "primary_source_targets_are_evidence": false,
+    "conflicts_remain_unresolved_until_new_evidence": true
   },
   "signature_semantics": {
     "purpose": "bind externally produced signature bytes to exact object identity",
     "cryptographic_verification": "external",
-    "does_not_establish": ["semantic_truth", "scientific_validity", "canonical_status", "signer_intent_beyond_signature_scope"]
+    "does_not_establish": [
+      "semantic_truth",
+      "scientific_validity",
+      "canonical_status",
+      "signer_intent_beyond_signature_scope"
+    ]
   },
   "freshness_semantics": {
     "fresh": "source timestamp is within the configured observation window",
@@ -58,6 +96,14 @@
     "undated": "no usable source timestamp was available",
     "future-dated": "source timestamp is later than the evaluation time",
     "truth_rule": "freshness changes confidence in currency, not semantic truth value"
+  },
+  "publication_semantics": {
+    "deadline_maturity": "eligibility-only",
+    "clearance": "safety-gate-receipt-not-execution-authority",
+    "executor_default": "dry-run",
+    "current_authorization": "required-at-execution-time",
+    "credential_persistence": "forbidden",
+    "archive_presence": "preservation-evidence-not-semantic-truth"
   },
   "authority_firewall": {
     "semantic_authority_owner": "QSOL-SUBSTRATE",

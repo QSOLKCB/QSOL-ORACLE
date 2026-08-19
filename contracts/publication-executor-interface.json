@@ -1,0 +1,26 @@
+{
+  "protocol": "QSOL-PUBLICATION-EXECUTOR-INTERFACE/1",
+  "version": "1.0.0",
+  "purpose": "replaceable platform adapter contract for QSOL-TIMELOCK publication execution",
+  "required_semantics": [
+    "dry_run_default",
+    "no_stored_credentials",
+    "current_authority_required",
+    "fail_closed",
+    "postcondition_verification",
+    "replaceable_adapter"
+  ],
+  "adapter_contract": {
+    "plan": "produce a side-effect-free execution plan bound to a cleared publication receipt",
+    "execute": "perform a platform action only after explicit current authority and runtime credentials are supplied",
+    "observe_postcondition": "verify the platform-reported target state after action"
+  },
+  "credential_policy": {
+    "persistence": "forbidden",
+    "source": "runtime-only",
+    "historic_credential_recovery": "forbidden"
+  },
+  "oracle_has_execution_authority": false,
+  "platform_is_semantic_authority": false,
+  "future_platform_rule": "replace the adapter, not the timelock intent or safety gates"
+}

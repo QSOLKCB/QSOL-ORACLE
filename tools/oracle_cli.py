@@ -12,6 +12,23 @@ def _print(value) -> int:
     return 0
 
 
+def _json_object(path: str) -> dict:
+    value = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return value
+
+
+def _requirement(value: str) -> dict:
+    parts = value.split(":", 2)
+    if len(parts) != 3:
+        raise argparse.ArgumentTypeError("requirement must be ID:KIND:DETAIL")
+    requirement_id, kind, detail = parts
+    if not requirement_id or not kind or not detail:
+        raise argparse.ArgumentTypeError("requirement ID, KIND and DETAIL must be non-empty")
+    return {"id": requirement_id, "kind": kind, "detail": detail, "satisfied": False}
+
+
 def build_parser(api) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="QSOL-ORACLE reference tooling")
     sub = p.add_subparsers(dest="command", required=True)
@@ -29,9 +46,69 @@ def build_parser(api) -> argparse.ArgumentParser:
     col.add_argument("--source"); col.add_argument("--source-time"); col.add_argument("--input")
     col.add_argument("--fixture"); col.add_argument("--fixture-case"); col.add_argument("--at")
     col.add_argument("--max-age", type=int)
+
     tl = sub.add_parser("timelock", help="evaluate the QSOL-CONTEXT timelock")
     tl.add_argument("--at")
-    un = sub.add_parser("unknown", help="emit an actionable unknown response")
+
+    runknown = sub.add_parser(
+        "research-unknown",
+        help="emit a structured unknown with missing-evidence and research targets",
+    )
+    runknown.add_argument("--subject", required=True)
+    runknown.add_argument("--question", required=True)
+    runknown.add_argument(
+        "--requirement",
+        action="append",
+        type=_requirement,
+        default=[],
+        help="unsatisfied requirement as ID:KIND:DETAIL",
+    )
+    runknown.add_argument(
+        "--plausible-answer",
+        help="test input only; ignored while evidence is missing",
+    )
+
+    conflict = sub.add_parser(
+        "conflict-bundle",
+        help="build a conflict bundle from a JSON file containing subject, dimension, observations",
+    )
+    conflict.add_argument("--input", required=True)
+
+    scan = sub.add_parser(
+        "scan-publication",
+        help="scan a local private repository against an explicit classification manifest",
+    )
+    scan.add_argument("--repo", required=True)
+    scan.add_argument("--classification", required=True)
+    scan.add_argument("--subject", required=True)
+    scan.add_argument("--source-commit", required=True)
+
+    clearance = sub.add_parser(
+        "publication-clearance",
+        help="build a fail-closed publication-clearance receipt from a scan",
+    )
+    clearance.add_argument("--scan", required=True)
+    clearance.add_argument("--at", required=True)
+    clearance.add_argument(
+        "--provenance-passed",
+        action="store_true",
+        help="explicitly assert that the separate provenance requirements passed",
+    )
+
+    publish = sub.add_parser(
+        "publish",
+        help="plan or execute publication through a replaceable platform adapter; dry-run by default",
+    )
+    publish.add_argument("--clearance", required=True)
+    publish.add_argument("--platform", default="github")
+    publish.add_argument("--execute", action="store_true", help="perform the platform action; default is dry-run")
+    publish.add_argument(
+        "--confirm-current-authority",
+        action="store_true",
+        help="operator assertion required for real execution; assertion is not treated as proof",
+    )
+
+    un = sub.add_parser("unknown", help="emit the legacy minimal actionable unknown response")
     un.add_argument("--missing", action="append", default=[]); un.add_argument("--search", action="append", default=[])
     return p
 
@@ -107,4 +184,49 @@ def main(api) -> int:
             "subject": contract["subject"], "evaluated_at": at.isoformat(), "not_before": contract["not_before"],
             "state": api.timelock_state(contract, at), "execution_authorized": False,
             "note": "Deadline maturity creates eligibility only; publication still requires every fail-closed precondition and a current authorized executor."})
+    if args.command == "research-unknown":
+        return _print(api.build_unknown_response(
+            subject=args.subject,
+            question=args.question,
+            requirements=args.requirement,
+            plausible_answer=args.plausible_answer,
+        ))
+    if args.command == "conflict-bundle":
+        source = _json_object(args.input)
+        return _print(api.build_conflict_bundle(
+            subject=source["subject"],
+            dimension=source["dimension"],
+            observations=source["observations"],
+        ))
+    if args.command == "scan-publication":
+        classification = _json_object(args.classification)
+        report = api.scan_publication_repository(
+            Path(args.repo),
+            classification,
+            subject=args.subject,
+            source_commit=args.source_commit,
+        )
+        api.validate_publication_scan(report)
+        return _print(report)
+    if args.command == "publication-clearance":
+        scan = _json_object(args.scan)
+        contract = api.load_json(api.TIMELOCK)
+        receipt = api.build_publication_clearance(
+            scan,
+            contract,
+            evaluated_at=args.at,
+            provenance_requirements_passed=args.provenance_passed,
+        )
+        api.validate_publication_clearance(receipt, scan=scan, contract=contract)
+        return _print(receipt)
+    if args.command == "publish":
+        clearance = _json_object(args.clearance)
+        contract = api.load_json(api.TIMELOCK)
+        executor = api.get_publication_executor(args.platform)
+        plan = executor.plan(contract=contract, clearance=clearance)
+        return _print(executor.execute(
+            plan,
+            execute=args.execute,
+            confirm_current_authority=args.confirm_current_authority,
+        ))
     return _print(api.unknown_response(args.missing, args.search))

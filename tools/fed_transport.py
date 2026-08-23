@@ -14,14 +14,14 @@ from pathlib import Path
 import re
 import sys
 import unicodedata
-from typing import Any
+from typing import Any, BinaryIO, Iterator
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 from nexus_membrane_common import MembraneError, scan_hidden_reasoning
-from nexus_query import build_query, execute
+from oracle_ledger import canonical_bytes as ledger_canonical_bytes
 from oracle_ledger import validate_ledger
 from research import build_unknown_response, classify_missing_evidence
 
@@ -44,6 +44,7 @@ MAX_ARRAY_ITEMS = 1_024
 MAX_OBJECT_MEMBERS = 1_024
 SAFE_INTEGER_MIN = -(2**53 - 1)
 SAFE_INTEGER_MAX = 2**53 - 1
+
 QUERY_FIELDS = frozenset({"subject", "event_hash", "event_type", "provenance_kind", "evidence_state", "limit"})
 REQUEST_FIELDS = frozenset({
     "protocol", "kind", "request_id", "query", "research", "synthetic_input",
@@ -54,7 +55,62 @@ RESPONSE_FIELDS = frozenset({
     "truncated", "source_events_sha256", "ledger_mutated", "transport_authority",
     "response_sha256",
 })
+REQUIREMENT_FIELDS = frozenset({"id", "kind", "satisfied", "detail"})
+REQUIREMENT_KINDS = frozenset({
+    "primary_source", "current_state", "identity", "provenance",
+    "conflict_resolution", "execution", "scope",
+})
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_ORACLE_EVENT_REF = re.compile(r"^oracle-event:([0-9a-f]{64})$")
+
+_EXPECTED_TRANSPORT = {
+    "profile": "local-stdio-jsonl",
+    "network_required": False,
+    "outbound_network_client": False,
+    "canonical_input_required": True,
+    "deterministic_output": True,
+    "maximum_line_bytes": MAX_LINE_BYTES,
+    "request_kind": REQUEST_KIND,
+    "response_kind": RESPONSE_KIND,
+    "response_budget_policy": "truncate-discovery-searches-before-response-limit",
+    "failure_semantics": "fail-closed-process-error-no-partial-authority",
+}
+_EXPECTED_OBSERVATION = {
+    "evidence_reference_prefix": "oracle-event:",
+    "maximum_evidence_refs": 256,
+    "conflict_requires_distinct_evidence_refs": True,
+    "conflict_supporting_reference_policy": "evidence.state=conflict only",
+    "reference_uniqueness": "NFC-normalized reference",
+    "ledger_membership_required_when_validating_live_response": True,
+    "suggested_search_purpose": "discovery-only",
+    "suggested_search_is_evidence": False,
+    "research_missing_evidence_forces_unknown": True,
+    "synthetic_input": False,
+    "truth_claim": False,
+    "evidence_promotion": False,
+    "authority_effect": "none",
+}
+_EXPECTED_FIREWALL = {
+    "transport_creates_truth": False,
+    "transport_promotes_evidence": False,
+    "transport_creates_governance_authority": False,
+    "transport_creates_or_reweights_votes": False,
+    "transport_installs_capabilities": False,
+    "transport_mutates_citizenship": False,
+    "transport_rewrites_history": False,
+    "transport_triggers_remote_execution": False,
+    "transport_mutates_oracle_ledger": False,
+    "transport_accepts_synthetic_input": False,
+    "transport_accepts_hidden_reasoning": False,
+}
+_EXPECTED_PHASE_GATE = (
+    "a valid local transport request may receive attributed ORACLE observations only; "
+    "known/conflict/unknown are preserved, explicit missing evidence forces unknown, "
+    "conflict requires two conflict-supporting canonical ledger references, searches remain "
+    "non-evidence and are bounded by the response budget, the ledger remains unchanged, and "
+    "no response creates truth, evidence promotion, authority, governance, capability, "
+    "citizenship, history rewrite, or execution rights"
+)
 
 
 class TransportError(ValueError):
@@ -84,6 +140,12 @@ def _nfc(value: str) -> str:
     if len(normalized.encode("utf-8")) > MAX_STRING_UTF8:
         raise TransportError("string_too_large")
     return normalized
+
+
+def _ledger_nfc(value: str) -> str:
+    if any(0xD800 <= ord(char) <= 0xDFFF for char in value):
+        raise TransportError("ledger_string_contains_lone_surrogate")
+    return unicodedata.normalize("NFC", value)
 
 
 def _normalize(value: Any, depth: int = 1) -> Any:
@@ -159,15 +221,43 @@ def parse_canonical_line(raw: bytes) -> dict[str, Any]:
     return normalized
 
 
-def _sha256(value: Any) -> str:
+def _sha256_transport(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+
+def _sha256_ledger_value(value: Any) -> str:
+    return hashlib.sha256(ledger_canonical_bytes(value)).hexdigest()
 
 
 def _bounded(value: Any, label: str, maximum: int) -> str:
     if not isinstance(value, str) or not value.strip() or len(value) > maximum:
         raise TransportError(f"{label}_invalid")
-    normalized = _nfc(value.strip())
-    return normalized
+    return _nfc(value.strip())
+
+
+def _validate_requirements(requirements: Any) -> list[dict[str, Any]]:
+    if not isinstance(requirements, list) or not 1 <= len(requirements) <= 64:
+        raise TransportError("research_requirements_invalid")
+    normalized_ids: set[str] = set()
+    for requirement in requirements:
+        if not isinstance(requirement, dict) or set(requirement) != REQUIREMENT_FIELDS:
+            raise TransportError("research_requirement_fields_invalid")
+        rid = _bounded(requirement["id"], "research_requirement_id", 256)
+        if rid in normalized_ids:
+            raise TransportError("research_requirement_id_duplicate")
+        normalized_ids.add(rid)
+        if requirement["kind"] not in REQUIREMENT_KINDS:
+            raise TransportError("research_requirement_kind_invalid")
+        if not isinstance(requirement["satisfied"], bool):
+            raise TransportError("research_requirement_satisfied_invalid")
+        _bounded(requirement["detail"], "research_requirement_detail", 4096)
+    try:
+        missing = classify_missing_evidence(requirements)
+    except ValueError as exc:
+        raise TransportError("research_requirements_invalid") from exc
+    if not missing:
+        raise TransportError("research_requires_missing_evidence")
+    return missing
 
 
 def validate_request(request: dict[str, Any]) -> None:
@@ -199,19 +289,63 @@ def validate_request(request: dict[str, Any]) -> None:
             raise TransportError("research_fields_invalid")
         _bounded(research["subject"], "research_subject", 4096)
         _bounded(research["question"], "research_question", 4096)
-        requirements = research["requirements"]
-        if not isinstance(requirements, list) or not 1 <= len(requirements) <= 64:
-            raise TransportError("research_requirements_invalid")
-        try:
-            missing = classify_missing_evidence(requirements)
-        except ValueError as exc:
-            raise TransportError("research_requirements_invalid") from exc
-        if not missing:
-            raise TransportError("research_requires_missing_evidence")
+        _validate_requirements(research["requirements"])
     canonical_bytes(request)
 
 
-def _validate_observation(observation: dict[str, Any]) -> None:
+def _event_field_equal(event: dict[str, Any], field: str, requested: Any) -> bool:
+    observed = event.get(field)
+    if not isinstance(observed, str) or not isinstance(requested, str):
+        return observed == requested
+    return _ledger_nfc(observed) == unicodedata.normalize("NFC", requested)
+
+
+def _matches(event: dict[str, Any], query: dict[str, Any]) -> bool:
+    if "event_hash" in query and event.get("event_hash") != query["event_hash"]:
+        return False
+    for field in ("subject", "event_type", "provenance_kind"):
+        if field in query and not _event_field_equal(event, field, query[field]):
+            return False
+    if "evidence_state" in query:
+        evidence = event.get("evidence")
+        state = evidence.get("state") if isinstance(evidence, dict) else None
+        if not isinstance(state, str) or _ledger_nfc(state) != unicodedata.normalize("NFC", query["evidence_state"]):
+            return False
+    return True
+
+
+def _execute_query(events: list[dict[str, Any]], query: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
+        raise TransportError("canonical_event_list_invalid")
+    ordered = sorted(events, key=lambda event: event.get("sequence", -1))
+    matches = [event for event in ordered if _matches(event, query)]
+    states = {
+        _ledger_nfc(state)
+        for event in matches
+        if isinstance(event.get("evidence"), dict)
+        and isinstance((state := event["evidence"].get("state")), str)
+    }
+    if not matches or (states and states <= {"unknown"}):
+        state = "unknown"
+    elif "conflict" in states:
+        state = "conflict"
+    else:
+        state = "known"
+    limit = query.get("limit", 256)
+    selected = matches[:limit]
+    return {"state": state, "total_matches": len(matches), "selected": selected, "query_truncated": len(matches) > len(selected)}
+
+
+def _ledger_hashes(events: list[dict[str, Any]]) -> set[str]:
+    hashes: set[str] = set()
+    for event in events:
+        event_hash = event.get("event_hash")
+        if isinstance(event_hash, str) and _SHA256.fullmatch(event_hash):
+            hashes.add(event_hash)
+    return hashes
+
+
+def _validate_observation(observation: dict[str, Any], *, ledger_hashes: set[str] | None = None) -> None:
     expected = {"schema", "state", "evidence_refs", "suggested_searches", "synthetic_input", "truth_claim", "evidence_promotion", "authority_effect"}
     if not isinstance(observation, dict) or set(observation) != expected:
         raise TransportError("observation_fields_invalid")
@@ -229,6 +363,12 @@ def _validate_observation(observation: dict[str, Any]) -> None:
         if not isinstance(item, dict) or set(item) != {"reference", "is_evidence"}:
             raise TransportError("observation_evidence_ref_invalid")
         reference = _bounded(item["reference"], "evidence_reference", 8192)
+        match = _ORACLE_EVENT_REF.fullmatch(reference)
+        if match is None:
+            raise TransportError("observation_evidence_reference_not_oracle_event")
+        event_hash = match.group(1)
+        if ledger_hashes is not None and event_hash not in ledger_hashes:
+            raise TransportError("observation_evidence_reference_not_in_ledger")
         key = unicodedata.normalize("NFC", reference)
         if key in seen:
             raise TransportError("observation_duplicate_evidence_reference")
@@ -253,81 +393,121 @@ def _validate_observation(observation: dict[str, Any]) -> None:
     canonical_bytes(observation)
 
 
-def export_observation(events: list[dict[str, Any]], request: dict[str, Any]) -> dict[str, Any]:
-    validate_request(request)
-    filters = dict(request["query"])
-    filters.setdefault("limit", 256)
-    try:
-        result = execute(events, build_query(request_id=request["request_id"], **filters))
-    except (MembraneError, ValueError) as exc:
-        raise TransportError("oracle_query_failed") from exc
-    payload = result["payload"]
-    state = payload["state"]
-    selected = payload["events"]
+def _reference_events(state: str, selected: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if state != "conflict":
+        return selected
+    supporting = [
+        event
+        for event in selected
+        if isinstance(event.get("evidence"), dict)
+        and isinstance(event["evidence"].get("state"), str)
+        and _ledger_nfc(event["evidence"]["state"]) == "conflict"
+    ]
+    hashes = {event.get("event_hash") for event in supporting if isinstance(event.get("event_hash"), str) and _SHA256.fullmatch(event["event_hash"])}
+    if len(hashes) < 2:
+        raise TransportError("conflict_requires_two_conflict_supporting_references")
+    return supporting
+
+
+def _make_refs(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     refs: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for event in selected:
+    for event in events:
         event_hash = event.get("event_hash")
         if not isinstance(event_hash, str) or _SHA256.fullmatch(event_hash) is None:
             raise TransportError("selected_event_hash_invalid")
         reference = f"oracle-event:{event_hash}"
-        normalized = unicodedata.normalize("NFC", reference)
-        if normalized in seen:
+        if reference in seen:
             raise TransportError("duplicate_selected_event")
-        seen.add(normalized)
+        seen.add(reference)
         refs.append({"reference": reference, "is_evidence": True})
+    return refs
 
-    searches: list[dict[str, Any]] = []
-    if state == "unknown" and request["research"] is not None:
-        research = request["research"]
+
+def _response_shell(request_id: str, observation: dict[str, Any], *, total_matches: int, source_events_sha256: str) -> dict[str, Any]:
+    returned = len(observation["evidence_refs"])
+    return {
+        "protocol": PROTOCOL,
+        "kind": RESPONSE_KIND,
+        "request_id": request_id,
+        "observation": observation,
+        "total_matches": total_matches,
+        "returned": returned,
+        "truncated": total_matches > returned,
+        "source_events_sha256": source_events_sha256,
+        "ledger_mutated": False,
+        "transport_authority": "none",
+        "response_sha256": "0" * 64,
+    }
+
+
+def _budget_searches(request_id: str, observation: dict[str, Any], candidates: list[dict[str, Any]], *, total_matches: int, source_events_sha256: str) -> list[dict[str, Any]]:
+    accepted: list[dict[str, Any]] = []
+    for candidate in candidates[:64]:
+        trial = copy.deepcopy(observation)
+        trial["suggested_searches"] = accepted + [candidate]
+        shell = _response_shell(request_id, trial, total_matches=total_matches, source_events_sha256=source_events_sha256)
         try:
-            unknown = build_unknown_response(
-                subject=research["subject"],
-                question=research["question"],
-                requirements=research["requirements"],
-            )
-        except ValueError as exc:
-            raise TransportError("unknown_research_generation_failed") from exc
-        searches = [
-            {
-                "query": item["query"],
-                "purpose": "discovery-only",
-                "is_evidence": False,
-                "admissible_as_evidence_without_observation": False,
-            }
-            for item in unknown["suggested_searches"][:64]
-        ]
+            canonical_bytes(shell)
+        except TransportError as exc:
+            if str(exc) == "transport_line_too_large":
+                break
+            raise
+        accepted.append(candidate)
+    return accepted
+
+
+def export_observation(events: list[dict[str, Any]], request: dict[str, Any]) -> dict[str, Any]:
+    validate_request(request)
+    query_result = _execute_query(events, request["query"])
+    state = query_result["state"]
+    selected = query_result["selected"]
+
+    if request["research"] is not None:
+        _validate_requirements(request["research"]["requirements"])
+        state = "unknown"
+
+    reference_events = _reference_events(state, selected)
+    refs = _make_refs(reference_events)
+    source_digest = _sha256_ledger_value(reference_events)
 
     observation = {
         "schema": OBSERVATION_SCHEMA_ID,
         "state": state,
         "evidence_refs": refs,
-        "suggested_searches": searches,
+        "suggested_searches": [],
         "synthetic_input": False,
         "truth_claim": False,
         "evidence_promotion": False,
         "authority_effect": "none",
     }
-    _validate_observation(observation)
 
-    response: dict[str, Any] = {
-        "protocol": PROTOCOL,
-        "kind": RESPONSE_KIND,
-        "request_id": request["request_id"],
-        "observation": observation,
-        "total_matches": payload["total_matches"],
-        "returned": payload["returned"],
-        "truncated": payload["truncated"],
-        "source_events_sha256": _sha256(selected),
-        "ledger_mutated": False,
-        "transport_authority": "none",
-    }
-    response["response_sha256"] = _sha256(response)
-    validate_response(response)
+    if state == "unknown" and request["research"] is not None:
+        research = request["research"]
+        try:
+            unknown = build_unknown_response(subject=research["subject"], question=research["question"], requirements=research["requirements"])
+        except ValueError as exc:
+            raise TransportError("unknown_research_generation_failed") from exc
+        candidates = [
+            {"query": item["query"], "purpose": "discovery-only", "is_evidence": False, "admissible_as_evidence_without_observation": False}
+            for item in unknown["suggested_searches"][:64]
+        ]
+        observation["suggested_searches"] = _budget_searches(
+            request["request_id"], observation, candidates,
+            total_matches=query_result["total_matches"], source_events_sha256=source_digest,
+        )
+
+    ledger_hashes = _ledger_hashes(events)
+    _validate_observation(observation, ledger_hashes=ledger_hashes)
+
+    response = _response_shell(request["request_id"], observation, total_matches=query_result["total_matches"], source_events_sha256=source_digest)
+    response.pop("response_sha256")
+    response["response_sha256"] = _sha256_transport(response)
+    validate_response(response, events)
     return response
 
 
-def validate_response(response: dict[str, Any]) -> None:
+def validate_response(response: dict[str, Any], events: list[dict[str, Any]] | None = None) -> None:
     if not isinstance(response, dict) or set(response) != RESPONSE_FIELDS:
         raise TransportError("response_fields_invalid")
     if response["protocol"] != PROTOCOL or response["kind"] != RESPONSE_KIND:
@@ -343,13 +523,14 @@ def validate_response(response: dict[str, Any]) -> None:
         raise TransportError("response_source_digest_invalid")
     if response["ledger_mutated"] is not False or response["transport_authority"] != "none":
         raise TransportError("response_authority_boundary_invalid")
-    _validate_observation(response["observation"])
+    hashes = _ledger_hashes(events) if events is not None else None
+    _validate_observation(response["observation"], ledger_hashes=hashes)
     supplied = response["response_sha256"]
     if not isinstance(supplied, str) or _SHA256.fullmatch(supplied) is None:
         raise TransportError("response_digest_invalid")
     payload = dict(response)
     payload.pop("response_sha256")
-    if supplied != _sha256(payload):
+    if supplied != _sha256_transport(payload):
         raise TransportError("response_digest_mismatch")
     if response["returned"] != len(response["observation"]["evidence_refs"]):
         raise TransportError("response_reference_count_mismatch")
@@ -361,23 +542,20 @@ def validate_contract() -> dict[str, Any]:
     required = {"type", "protocol", "version", "relationship", "oracle_role", "fed_role", "consumer_pin", "transport", "states", "observation", "authority_firewall", "phase_gate"}
     if not isinstance(contract, dict) or set(contract) != required:
         raise TransportError("fed_membrane_contract_fields_invalid")
-    if contract["type"] != "qsol-oracle-fed-membrane" or contract["protocol"] != PROTOCOL or contract["version"] != "1.0.0" or contract["relationship"] != "evidence-export-membrane":
+    if contract["type"] != "qsol-oracle-fed-membrane" or contract["protocol"] != PROTOCOL or contract["version"] != "1.0.0" or contract["relationship"] != "evidence-export-membrane" or contract["oracle_role"] != "WITNESSES" or contract["fed_role"] != "CONSUMES_ATTRIBUTED_OBSERVATIONS":
         raise TransportError("fed_membrane_contract_identity_invalid")
-    pin = contract["consumer_pin"]
-    if pin != {
-        "repository": "QSOLKCB/QSOL-FED",
-        "commit": PINNED_FED_COMMIT,
-        "schema_path": "schemas/oracle-observation-v1.schema.json",
-        "schema_id": OBSERVATION_SCHEMA_ID,
-    }:
+    if contract["consumer_pin"] != {"repository": "QSOLKCB/QSOL-FED", "commit": PINNED_FED_COMMIT, "schema_path": "schemas/oracle-observation-v1.schema.json", "schema_id": OBSERVATION_SCHEMA_ID}:
         raise TransportError("fed_consumer_pin_drift")
+    if contract["transport"] != _EXPECTED_TRANSPORT:
+        raise TransportError("fed_transport_profile_drift")
     if contract["states"] != ["known", "conflict", "unknown"]:
         raise TransportError("fed_transport_state_set_drift")
-    if contract["transport"].get("profile") != "local-stdio-jsonl" or contract["transport"].get("network_required") is not False or contract["transport"].get("outbound_network_client") is not False or contract["transport"].get("maximum_line_bytes") != MAX_LINE_BYTES:
-        raise TransportError("fed_transport_profile_drift")
-    firewall = contract["authority_firewall"]
-    if not isinstance(firewall, dict) or not firewall or any(value is not False for value in firewall.values()):
+    if contract["observation"] != _EXPECTED_OBSERVATION:
+        raise TransportError("fed_transport_observation_contract_drift")
+    if contract["authority_firewall"] != _EXPECTED_FIREWALL:
         raise TransportError("fed_transport_authority_firewall_drift")
+    if contract["phase_gate"] != _EXPECTED_PHASE_GATE:
+        raise TransportError("fed_transport_phase_gate_drift")
 
     observation_schema = json.loads(OBSERVATION_SCHEMA.read_text(encoding="utf-8"))
     request_schema = json.loads(REQUEST_SCHEMA.read_text(encoding="utf-8"))
@@ -403,11 +581,20 @@ def _write_response(response: dict[str, Any]) -> None:
     sys.stdout.buffer.flush()
 
 
-def serve(events: list[dict[str, Any]]) -> int:
-    for raw_line in sys.stdin.buffer:
+def _bounded_lines(stream: BinaryIO) -> Iterator[bytes]:
+    while True:
+        raw_line = stream.readline(MAX_LINE_BYTES + 2)
+        if raw_line == b"":
+            return
+        if len(raw_line) > MAX_LINE_BYTES + 1:
+            raise TransportError("jsonl_line_too_large")
         if not raw_line.endswith(b"\n"):
-            raise TransportError("jsonl_line_missing_newline")
-        raw = raw_line[:-1]
+            raise TransportError("jsonl_line_missing_newline_or_too_large")
+        yield raw_line[:-1]
+
+
+def serve(events: list[dict[str, Any]]) -> int:
+    for raw in _bounded_lines(sys.stdin.buffer):
         request = parse_canonical_line(raw)
         _write_response(export_observation(events, request))
     return 0

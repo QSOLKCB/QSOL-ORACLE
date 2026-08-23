@@ -20,6 +20,7 @@
     "maximum_line_bytes": 65536,
     "request_kind": "evidence.export",
     "response_kind": "evidence.export.result",
+    "response_budget_policy": "truncate-discovery-searches-before-response-limit",
     "failure_semantics": "fail-closed-process-error-no-partial-authority"
   },
   "states": [
@@ -31,9 +32,12 @@
     "evidence_reference_prefix": "oracle-event:",
     "maximum_evidence_refs": 256,
     "conflict_requires_distinct_evidence_refs": true,
+    "conflict_supporting_reference_policy": "evidence.state=conflict only",
     "reference_uniqueness": "NFC-normalized reference",
+    "ledger_membership_required_when_validating_live_response": true,
     "suggested_search_purpose": "discovery-only",
     "suggested_search_is_evidence": false,
+    "research_missing_evidence_forces_unknown": true,
     "synthetic_input": false,
     "truth_claim": false,
     "evidence_promotion": false,
@@ -52,5 +56,5 @@
     "transport_accepts_synthetic_input": false,
     "transport_accepts_hidden_reasoning": false
   },
-  "phase_gate": "a valid local transport request may receive attributed ORACLE observations only; known/conflict/unknown are preserved, searches remain non-evidence, the ledger remains unchanged, and no response creates truth, evidence promotion, authority, governance, capability, citizenship, history rewrite, or execution rights"
+  "phase_gate": "a valid local transport request may receive attributed ORACLE observations only; known/conflict/unknown are preserved, explicit missing evidence forces unknown, conflict requires two conflict-supporting canonical ledger references, searches remain non-evidence and are bounded by the response budget, the ledger remains unchanged, and no response creates truth, evidence promotion, authority, governance, capability, citizenship, history rewrite, or execution rights"
 }

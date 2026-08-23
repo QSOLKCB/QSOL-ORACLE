@@ -42,6 +42,7 @@ UNKNOWN > PLAUSIBLE_GUESS
 CLEARANCE != EXECUTION_AUTHORITY
 DRY_RUN != EXECUTED
 ARCHIVED_COPY != SEMANTIC_AUTHORITY
+TRANSPORT != AUTHORITY
 ```
 
 ## Response states and research continuation
@@ -180,3 +181,47 @@ Do not bypass publication clearance, permanent-deny, unclassified-material, auth
 ## NEXUS
 
 ORACLE may provide evidence feeds and receipts to NEXUS and may check whether visible NEXUS output exceeds cited evidence. ORACLE must never expose or request hidden chain-of-thought.
+
+## QSOL-FED Phase 3B transport
+
+The native donor-side FED membrane is:
+
+```text
+contract: contracts/fed-membrane.json
+protocol: QSOL-ORACLE-FED/1
+transport: local-stdio-jsonl
+implementation: tools/fed_transport.py
+documentation: docs/FED.md
+request_schema: schema/fed-transport-request.schema.json
+response_schema: schema/fed-transport-response.schema.json
+observation_schema: schema/fed-oracle-observation.schema.json
+consumer_repository: QSOLKCB/QSOL-FED
+consumer_commit: 407d0ed75c7d8a76bd49b3c30e74a0ae2c59f1e6
+network_required: false
+transport_authority: none
+```
+
+The pinned observation schema is byte-compared in CI against the exact QSOL-FED consumer commit.
+
+Exports preserve `known`, `conflict`, and `unknown`. `known` requires at least one evidence reference. `conflict` requires at least two distinct evidence references. Suggested searches remain discovery-only non-evidence.
+
+Hard request non-authorities:
+
+```text
+synthetic_input = false
+evidence_promotion_requested = false
+authority_requested = false
+remote_execution_requested = false
+```
+
+Hard response non-authorities:
+
+```text
+truth_claim = false
+evidence_promotion = false
+authority_effect = none
+ledger_mutated = false
+transport_authority = none
+```
+
+Do not infer that live FED transport enables Holodeck/synthetic admission. `oracle_holodeck_synthetic_admission` remains a separate unimplemented contract until explicitly reviewed.

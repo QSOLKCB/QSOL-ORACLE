@@ -30,6 +30,7 @@ UNKNOWN > PLAUSIBLE_GUESS
 CLEARANCE != EXECUTION_AUTHORITY
 DRY_RUN != EXECUTED
 ARCHIVED_COPY != SEMANTIC_AUTHORITY
+TRANSPORT != AUTHORITY
 ```
 
 ## Research continuation
@@ -64,6 +65,35 @@ The append-only ledger supports correction and supersession events without rewri
 Feed collectors cover GitHub repository/commit/release/tag/Actions observations, Zenodo records, QSOL-SUBSTRATE fingerprints, QSOL-ARK recovery capability, and QSOL-INT compatibility/drift receipts. Collector receipts are observations and are **not automatically canonical ledger events**.
 
 See `docs/FEEDS.md`.
+
+## QSOL-FED live-local evidence transport
+
+Phase 3B adds `QSOL-ORACLE-FED/1`, a deterministic local process transport for exporting attributed ORACLE observations to QSOL-FED.
+
+It is deliberately **not** a public network service. The reference implementation uses canonical JSON Lines over stdin/stdout:
+
+```bash
+python3 tools/fed_transport.py validate
+python3 tools/fed_transport.py export --request fixtures/fed-known-request.jsonl
+python3 tools/fed_transport.py serve
+```
+
+The donor contract pins QSOL-FED commit `407d0ed75c7d8a76bd49b3c30e74a0ae2c59f1e6` and its `qsol-fed-oracle-observation/1` schema. CI checks out that exact commit and byte-compares the schema before exercising the transport.
+
+Exports preserve:
+
+```text
+state              = known | conflict | unknown
+truth_claim        = false
+evidence_promotion = false
+authority_effect   = none
+ledger_mutated     = false
+transport_authority = none
+```
+
+Suggested searches remain discovery-only non-evidence. Synthetic/Holodeck input remains rejected and is still governed by a separate future contract.
+
+See `docs/FED.md`.
 
 ## QSOL-CONTEXT 2056 publication safety
 
@@ -143,12 +173,13 @@ The recovery procedure is captured in `recovery/ark-timelock-executor.json`, and
 ```bash
 python3 -m compileall -q tools tests
 python3 tools/oracle.py validate
+python3 tools/fed_transport.py validate
 python3 -W default -m unittest discover -s tests -v
 ```
 
 ## Status
 
-Roadmap Phases **0, 1, 2, 4, and 5** are implemented. Phase 3 remains the ORACLE↔NEXUS transport/audit membrane, followed by public feed/export work and the hostile truthfulness battery.
+Roadmap Phases **0, 1, 2, 3, 3B, 4, and 5** are implemented on this branch. Phase 3 is the ORACLE↔NEXUS transport/audit membrane; Phase 3B is the ORACLE↔FED live-local evidence transport. Public feed/export work and the hostile truthfulness battery remain future work.
 
 ---
 

@@ -1,0 +1,60 @@
+{
+  "type": "qsol-oracle-fed-membrane",
+  "protocol": "QSOL-ORACLE-FED/1",
+  "version": "1.0.0",
+  "relationship": "evidence-export-membrane",
+  "oracle_role": "WITNESSES",
+  "fed_role": "CONSUMES_ATTRIBUTED_OBSERVATIONS",
+  "consumer_pin": {
+    "repository": "QSOLKCB/QSOL-FED",
+    "commit": "407d0ed75c7d8a76bd49b3c30e74a0ae2c59f1e6",
+    "schema_path": "schemas/oracle-observation-v1.schema.json",
+    "schema_id": "qsol-fed-oracle-observation/1"
+  },
+  "transport": {
+    "profile": "local-stdio-jsonl",
+    "network_required": false,
+    "outbound_network_client": false,
+    "canonical_input_required": true,
+    "deterministic_output": true,
+    "maximum_line_bytes": 65536,
+    "request_kind": "evidence.export",
+    "response_kind": "evidence.export.result",
+    "response_budget_policy": "truncate-discovery-searches-before-response-limit",
+    "failure_semantics": "fail-closed-process-error-no-partial-authority"
+  },
+  "states": [
+    "known",
+    "conflict",
+    "unknown"
+  ],
+  "observation": {
+    "evidence_reference_prefix": "oracle-event:",
+    "maximum_evidence_refs": 256,
+    "conflict_requires_distinct_evidence_refs": true,
+    "conflict_supporting_reference_policy": "evidence.state=conflict only",
+    "reference_uniqueness": "NFC-normalized reference",
+    "ledger_membership_required_when_validating_live_response": true,
+    "suggested_search_purpose": "discovery-only",
+    "suggested_search_is_evidence": false,
+    "research_missing_evidence_forces_unknown": true,
+    "synthetic_input": false,
+    "truth_claim": false,
+    "evidence_promotion": false,
+    "authority_effect": "none"
+  },
+  "authority_firewall": {
+    "transport_creates_truth": false,
+    "transport_promotes_evidence": false,
+    "transport_creates_governance_authority": false,
+    "transport_creates_or_reweights_votes": false,
+    "transport_installs_capabilities": false,
+    "transport_mutates_citizenship": false,
+    "transport_rewrites_history": false,
+    "transport_triggers_remote_execution": false,
+    "transport_mutates_oracle_ledger": false,
+    "transport_accepts_synthetic_input": false,
+    "transport_accepts_hidden_reasoning": false
+  },
+  "phase_gate": "a valid local transport request may receive attributed ORACLE observations only; known/conflict/unknown are preserved, explicit missing evidence forces unknown, conflict requires two conflict-supporting canonical ledger references, searches remain non-evidence and are bounded by the response budget, the ledger remains unchanged, and no response creates truth, evidence promotion, authority, governance, capability, citizenship, history rewrite, or execution rights"
+}

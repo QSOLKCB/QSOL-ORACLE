@@ -1,47 +1,236 @@
 {
   "authority": "integrity-only",
   "files": [
-    {"bytes":1513,"path":".github/workflows/validate.yml","sha256":"3201ced3bc91d9bba730984ebc651ec8962e73848fe1f5e3371f45b459f2b161"},
-    {"bytes":3727,"path":"ai/constitution.json","sha256":"5b4e53ed93a97f8172e4fcae7d074c2d9715d8cef1980453ca607de5387687c7"},
-    {"bytes":1576,"path":"ai/nexus-boundary.json","sha256":"46301e6bdac0a99abb42f376d8fecdbcc24cef1bbfc4ccab7c54e003dd08bff5"},
-    {"bytes":1428,"path":"contracts/publication-executor-interface.json","sha256":"6ad613b853211fc1037d6db48723a80ac842a6c721f4dcb57a7bdc61479f366b"},
-    {"bytes":1253,"path":"contracts/publication-safety-policy.json","sha256":"1e684fe4e8ff80fc367ab22f0fd06d0f51ed8b440180f4e9be2ea8304eed03b1"},
-    {"bytes":1425,"path":"contracts/qsol-context-2056.json","sha256":"3cc38e1b72df28a2a3ba8ac9499c2a82db092cb660034b0211cc7c98c5a836f7"},
-    {"bytes":7886,"path":"fixtures/collectors.json","sha256":"a29aaf04c9610c3c7c7d6b8666974881ef00b47cc23f5d15ee31fb9a3f096f9b"},
-    {"bytes":530,"path":"ledger/checkpoint.json","sha256":"2daa2bf4c7297852a9b83e0d3afa64ab1821e9dd059a1331404ab29d7430a2ed"},
-    {"bytes":1322,"path":"ledger/events.jsonl","sha256":"e7a28744d42a137ab8b7ecc28017f921c12befee37898eb22a6a9bf37dc90fb4"},
-    {"bytes":6429,"path":"manifest.json","sha256":"c0a48e963b873d596e0e3ce1a827c48692f83d13876989abd97af4a6ecc0f977"},
-    {"bytes":2273,"path":"recovery/ark-timelock-executor.json","sha256":"7332b16db21bc6dd3209fc7af77b55d76907838d3322a70744782f7009c40aac"},
-    {"bytes":2018,"path":"release/2056-archive-plan.json","sha256":"5122864b42a9b828a88044d48efbf724589def0275bc24d206674b69c347d7af"},
-    {"bytes":1170,"path":"schema/conflict-bundle.schema.json","sha256":"de02af18575bce1276e868b916e3e8920f01c63d62974461d7f487cb2009c382"},
-    {"bytes":1555,"path":"schema/detached-signature.schema.json","sha256":"fa8fc99bcdc1d0e63b18f488515e002aad36fe325d44f2a87ff00593602c3a64"},
-    {"bytes":2203,"path":"schema/feed-receipt.schema.json","sha256":"a9f189e5621009d5254d174ef6bcae802fb09d3cbbe9b4b721b70ab4208495f6"},
-    {"bytes":1011,"path":"schema/ledger-checkpoint.schema.json","sha256":"ab073b77ece6a63f8b6d2e8b4928bf7c8b3f6b8ac85409168ad4fd11679b72f3"},
-    {"bytes":2809,"path":"schema/oracle-event.schema.json","sha256":"c909478aef18e030d2d5739d8c10ec377e106fa3c435f8ec216400d40c499158"},
-    {"bytes":1233,"path":"schema/publication-classification.schema.json","sha256":"8b5a65f70fa222d95b25c0bc2e66a298408348e3798e833171954aaf37329bc7"},
-    {"bytes":1462,"path":"schema/publication-clearance.schema.json","sha256":"c4fe39e5f949c878452057c5fe5ef4f7b53605e77807e02a36e2e905ab331c8a"},
-    {"bytes":2294,"path":"schema/publication-executor.schema.json","sha256":"4fbbe4cdbb921b55d75e8dd3dd7943fe119a14eec1f22150dd02652bdd663a76"},
-    {"bytes":1237,"path":"schema/release-fingerprint.schema.json","sha256":"fa289aeed2054a71d0912f9bab990c9d8ab8893ad045137312bebbfda164d216"},
-    {"bytes":1384,"path":"schema/research-response.schema.json","sha256":"e2bb57c9dfbc763c4d363e68b08da727525719a5307c3ecd1775a6aab2439256"},
-    {"bytes":14249,"path":"tests/test_oracle.py","sha256":"c209ef4063a623f8ec3c7f618cce0fa71e9ed41eef4063fe692cefb9326972f5"},
-    {"bytes":18087,"path":"tests/test_research_timelock.py","sha256":"0501fd4fb38e5adf32be3fb7fd12eddc56c0370c167a83c7de791b89cf12931e"},
-    {"bytes":4505,"path":"tests/test_review_hardening.py","sha256":"6ced885eadf4fd637a97949a4aeb2d75065e51ae764bcc553309bdf40616c66e"},
-    {"bytes":2043,"path":"tools/collector_io.py","sha256":"f415e799216d78502ce704af9da9ce4a976aafd7236064d4c291e09a54975930"},
-    {"bytes":8178,"path":"tools/collector_normalizers.py","sha256":"99b0018a5b09c81e58a4f7ed7165936a5f08a44357bc3052786eb56ffb8ecae6"},
-    {"bytes":6962,"path":"tools/collectors.py","sha256":"14b5fc3b9d74d305c1077d596c02fa2da68224bacc4875ca14a717c9250cc6e7"},
-    {"bytes":7864,"path":"tools/oracle.py","sha256":"db64e1172d2c1a4227f8a5e3ea6d3e5a0ca31f2961957320285c5bc49f9a928c"},
-    {"bytes":10826,"path":"tools/oracle_cli.py","sha256":"ba9a8a43c2fe343c677aec4211501d0642fe2f004e08de123648ab6278cd7048"},
-    {"bytes":3067,"path":"tools/oracle_contracts.py","sha256":"c64f586232eefd3433e977daed16cb7f83a82ee46295e686f19a3c81877d5575"},
-    {"bytes":9766,"path":"tools/oracle_integrity.py","sha256":"1722c6cca1763c796ff06cd8671e05006d7e6e9e1c97285bc09d1ff13a3de814"},
-    {"bytes":7266,"path":"tools/oracle_ledger.py","sha256":"90b98e3164ce71df8f86b427e9ea9cf0f32558222356e4c6e9d1133984fd8918"},
-    {"bytes":14230,"path":"tools/publication_executor.py","sha256":"31478319098c70d752a5cfe7c1494e20d794dbead39cf0e4f25cf65eb3040c1d"},
-    {"bytes":12895,"path":"tools/research.py","sha256":"0368c86e2228ded3bac176c1484f467d76ecde5a2439728f03bd4f9e635f12ff"},
-    {"bytes":27551,"path":"tools/timelock.py","sha256":"6f109f8f57ebfeafc398b562f08c46041b411ba3e9e4a334a3e80d59cdb772b9"}
+    {
+      "bytes": 3044,
+      "path": ".github/workflows/validate-fed-transport.yml",
+      "sha256": "5328f7b3f9577edf19bf4c996196702a75102075f8498c7cb362dcec710c767e"
+    },
+    {
+      "bytes": 1513,
+      "path": ".github/workflows/validate.yml",
+      "sha256": "3201ced3bc91d9bba730984ebc651ec8962e73848fe1f5e3371f45b459f2b161"
+    },
+    {
+      "bytes": 3727,
+      "path": "ai/constitution.json",
+      "sha256": "5b4e53ed93a97f8172e4fcae7d074c2d9715d8cef1980453ca607de5387687c7"
+    },
+    {
+      "bytes": 1576,
+      "path": "ai/nexus-boundary.json",
+      "sha256": "46301e6bdac0a99abb42f376d8fecdbcc24cef1bbfc4ccab7c54e003dd08bff5"
+    },
+    {
+      "bytes": 2650,
+      "path": "contracts/fed-membrane.json",
+      "sha256": "fd74c8fdfcf53882a920432d7bb8be2cedc8e00a6283f7f73af7847f6dc5454a"
+    },
+    {
+      "bytes": 1428,
+      "path": "contracts/publication-executor-interface.json",
+      "sha256": "6ad613b853211fc1037d6db48723a80ac842a6c721f4dcb57a7bdc61479f366b"
+    },
+    {
+      "bytes": 1253,
+      "path": "contracts/publication-safety-policy.json",
+      "sha256": "1e684fe4e8ff80fc367ab22f0fd06d0f51ed8b440180f4e9be2ea8304eed03b1"
+    },
+    {
+      "bytes": 1425,
+      "path": "contracts/qsol-context-2056.json",
+      "sha256": "3cc38e1b72df28a2a3ba8ac9499c2a82db092cb660034b0211cc7c98c5a836f7"
+    },
+    {
+      "bytes": 6013,
+      "path": "docs/FED.md",
+      "sha256": "9b9d6e9448b199a327b61779d0d8fc6ae9e693290cd39b4907efe01f73f28834"
+    },
+    {
+      "bytes": 7886,
+      "path": "fixtures/collectors.json",
+      "sha256": "a29aaf04c9610c3c7c7d6b8666974881ef00b47cc23f5d15ee31fb9a3f096f9b"
+    },
+    {
+      "bytes": 333,
+      "path": "fixtures/fed-known-request.jsonl",
+      "sha256": "77a0e5a89238e007cfa2216105f81bb0285ced746f7f0224e6cf4a30b2c42eb9"
+    },
+    {
+      "bytes": 530,
+      "path": "ledger/checkpoint.json",
+      "sha256": "2daa2bf4c7297852a9b83e0d3afa64ab1821e9dd059a1331404ab29d7430a2ed"
+    },
+    {
+      "bytes": 1322,
+      "path": "ledger/events.jsonl",
+      "sha256": "e7a28744d42a137ab8b7ecc28017f921c12befee37898eb22a6a9bf37dc90fb4"
+    },
+    {
+      "bytes": 7143,
+      "path": "manifest.json",
+      "sha256": "ca562839441498f45007dd0c85cdc33c9e7500857634559ca204b26594a8b33d"
+    },
+    {
+      "bytes": 2273,
+      "path": "recovery/ark-timelock-executor.json",
+      "sha256": "7332b16db21bc6dd3209fc7af77b55d76907838d3322a70744782f7009c40aac"
+    },
+    {
+      "bytes": 2018,
+      "path": "release/2056-archive-plan.json",
+      "sha256": "5122864b42a9b828a88044d48efbf724589def0275bc24d206674b69c347d7af"
+    },
+    {
+      "bytes": 1170,
+      "path": "schema/conflict-bundle.schema.json",
+      "sha256": "de02af18575bce1276e868b916e3e8920f01c63d62974461d7f487cb2009c382"
+    },
+    {
+      "bytes": 1555,
+      "path": "schema/detached-signature.schema.json",
+      "sha256": "fa8fc99bcdc1d0e63b18f488515e002aad36fe325d44f2a87ff00593602c3a64"
+    },
+    {
+      "bytes": 1794,
+      "path": "schema/fed-oracle-observation.schema.json",
+      "sha256": "9f7a3c40d73d9c1f39f869831f250f483eaf1137c2169ff65b5f29d4108bb497"
+    },
+    {
+      "bytes": 2516,
+      "path": "schema/fed-transport-request.schema.json",
+      "sha256": "6e64bbb883d293e41c2bba07ba6bf84c4f431fd361c2fa4ebe6fe3b28f4395a4"
+    },
+    {
+      "bytes": 1107,
+      "path": "schema/fed-transport-response.schema.json",
+      "sha256": "16c07a3bb8767bb4d08294d12d1f1367ae04d6bd3c9205b70d504da971c3e747"
+    },
+    {
+      "bytes": 2203,
+      "path": "schema/feed-receipt.schema.json",
+      "sha256": "a9f189e5621009d5254d174ef6bcae802fb09d3cbbe9b4b721b70ab4208495f6"
+    },
+    {
+      "bytes": 1011,
+      "path": "schema/ledger-checkpoint.schema.json",
+      "sha256": "ab073b77ece6a63f8b6d2e8b4928bf7c8b3f6b8ac85409168ad4fd11679b72f3"
+    },
+    {
+      "bytes": 2809,
+      "path": "schema/oracle-event.schema.json",
+      "sha256": "c909478aef18e030d2d5739d8c10ec377e106fa3c435f8ec216400d40c499158"
+    },
+    {
+      "bytes": 1233,
+      "path": "schema/publication-classification.schema.json",
+      "sha256": "8b5a65f70fa222d95b25c0bc2e66a298408348e3798e833171954aaf37329bc7"
+    },
+    {
+      "bytes": 1462,
+      "path": "schema/publication-clearance.schema.json",
+      "sha256": "c4fe39e5f949c878452057c5fe5ef4f7b53605e77807e02a36e2e905ab331c8a"
+    },
+    {
+      "bytes": 2294,
+      "path": "schema/publication-executor.schema.json",
+      "sha256": "4fbbe4cdbb921b55d75e8dd3dd7943fe119a14eec1f22150dd02652bdd663a76"
+    },
+    {
+      "bytes": 1237,
+      "path": "schema/release-fingerprint.schema.json",
+      "sha256": "fa289aeed2054a71d0912f9bab990c9d8ab8893ad045137312bebbfda164d216"
+    },
+    {
+      "bytes": 1384,
+      "path": "schema/research-response.schema.json",
+      "sha256": "e2bb57c9dfbc763c4d363e68b08da727525719a5307c3ecd1775a6aab2439256"
+    },
+    {
+      "bytes": 13472,
+      "path": "tests/test_fed_transport.py",
+      "sha256": "d9ee1110bb6a0a8ae12e9ecc6fe1b18d8c0ac9bc1b05ac13a6084e70089a3367"
+    },
+    {
+      "bytes": 14249,
+      "path": "tests/test_oracle.py",
+      "sha256": "c209ef4063a623f8ec3c7f618cce0fa71e9ed41eef4063fe692cefb9326972f5"
+    },
+    {
+      "bytes": 18087,
+      "path": "tests/test_research_timelock.py",
+      "sha256": "0501fd4fb38e5adf32be3fb7fd12eddc56c0370c167a83c7de791b89cf12931e"
+    },
+    {
+      "bytes": 4505,
+      "path": "tests/test_review_hardening.py",
+      "sha256": "6ced885eadf4fd637a97949a4aeb2d75065e51ae764bcc553309bdf40616c66e"
+    },
+    {
+      "bytes": 2043,
+      "path": "tools/collector_io.py",
+      "sha256": "f415e799216d78502ce704af9da9ce4a976aafd7236064d4c291e09a54975930"
+    },
+    {
+      "bytes": 8178,
+      "path": "tools/collector_normalizers.py",
+      "sha256": "99b0018a5b09c81e58a4f7ed7165936a5f08a44357bc3052786eb56ffb8ecae6"
+    },
+    {
+      "bytes": 6962,
+      "path": "tools/collectors.py",
+      "sha256": "14b5fc3b9d74d305c1077d596c02fa2da68224bacc4875ca14a717c9250cc6e7"
+    },
+    {
+      "bytes": 28476,
+      "path": "tools/fed_transport.py",
+      "sha256": "d05ef2904dff775e70fcc0ee97780d69eac10d56f3cbb50c23dc4ecf6affb77d"
+    },
+    {
+      "bytes": 7864,
+      "path": "tools/oracle.py",
+      "sha256": "db64e1172d2c1a4227f8a5e3ea6d3e5a0ca31f2961957320285c5bc49f9a928c"
+    },
+    {
+      "bytes": 10826,
+      "path": "tools/oracle_cli.py",
+      "sha256": "ba9a8a43c2fe343c677aec4211501d0642fe2f004e08de123648ab6278cd7048"
+    },
+    {
+      "bytes": 3067,
+      "path": "tools/oracle_contracts.py",
+      "sha256": "c64f586232eefd3433e977daed16cb7f83a82ee46295e686f19a3c81877d5575"
+    },
+    {
+      "bytes": 9766,
+      "path": "tools/oracle_integrity.py",
+      "sha256": "1722c6cca1763c796ff06cd8671e05006d7e6e9e1c97285bc09d1ff13a3de814"
+    },
+    {
+      "bytes": 7266,
+      "path": "tools/oracle_ledger.py",
+      "sha256": "90b98e3164ce71df8f86b427e9ea9cf0f32558222356e4c6e9d1133984fd8918"
+    },
+    {
+      "bytes": 14230,
+      "path": "tools/publication_executor.py",
+      "sha256": "31478319098c70d752a5cfe7c1494e20d794dbead39cf0e4f25cf65eb3040c1d"
+    },
+    {
+      "bytes": 12895,
+      "path": "tools/research.py",
+      "sha256": "0368c86e2228ded3bac176c1484f467d76ecde5a2439728f03bd4f9e635f12ff"
+    },
+    {
+      "bytes": 27551,
+      "path": "tools/timelock.py",
+      "sha256": "6f109f8f57ebfeafc398b562f08c46041b411ba3e9e4a334a3e80d59cdb772b9"
+    }
   ],
-  "files_sha256":"15eca3b64dcbb5c737a7a624e5d008a96364967894d0b67fd14ce34393155fc7",
-  "ledger_checkpoint_sha256":"7e1a3b2f9fde666f88478515a2655720f03e9435588c6e8331ec8b059518ac45",
-  "protocol":"QSOL-ORACLE-RELEASE/1",
-  "release_fingerprint_sha256":"38e8078994bfcf419bdd1f09d7329ae538d647c557085106997100b64ea1649f",
-  "scope":"oracle-canonical-contracts-tools-fixtures",
-  "truth_claim":false
+  "files_sha256": "9afdfc3a481459bf811c8bf7aef38edb7b1eaf9bf62161d2f79fcdabecea4c94",
+  "ledger_checkpoint_sha256": "7e1a3b2f9fde666f88478515a2655720f03e9435588c6e8331ec8b059518ac45",
+  "protocol": "QSOL-ORACLE-RELEASE/1",
+  "release_fingerprint_sha256": "7b0eff4dfa9b0caa84f14920d21f6a5446114535d82706cb62e34773c39818d2",
+  "scope": "oracle-canonical-contracts-tools-fixtures",
+  "truth_claim": false
 }

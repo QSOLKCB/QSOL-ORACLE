@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "qsol-oracle-fed-request/1",
+  "title": "QSOL-ORACLE FED Evidence Export Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "kind",
+    "request_id",
+    "query",
+    "research",
+    "synthetic_input",
+    "evidence_promotion_requested",
+    "authority_requested",
+    "remote_execution_requested"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-FED/1"},
+    "kind": {"const": "evidence.export"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {"type": "string", "minLength": 1, "maxLength": 512},
+        "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "event_type": {"type": "string", "minLength": 1, "maxLength": 512},
+        "provenance_kind": {"type": "string", "minLength": 1, "maxLength": 512},
+        "evidence_state": {"type": "string", "minLength": 1, "maxLength": 512},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 256}
+      }
+    },
+    "research": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subject", "question", "requirements"],
+          "properties": {
+            "subject": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "question": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "requirements": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "kind", "satisfied", "detail"],
+                "properties": {
+                  "id": {"type": "string", "minLength": 1, "maxLength": 256},
+                  "kind": {"enum": ["primary_source", "current_state", "identity", "provenance", "conflict_resolution", "execution", "scope"]},
+                  "satisfied": {"type": "boolean"},
+                  "detail": {"type": "string", "minLength": 1, "maxLength": 4096}
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "synthetic_input": {"const": false},
+    "evidence_promotion_requested": {"const": false},
+    "authority_requested": {"const": false},
+    "remote_execution_requested": {"const": false}
+  }
+}

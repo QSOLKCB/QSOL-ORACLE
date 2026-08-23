@@ -1,0 +1,1 @@
+{"authority_requested":false,"evidence_promotion_requested":false,"kind":"evidence.export","protocol":"QSOL-ORACLE-FED/1","query":{"event_hash":"80468db2bf709982ce4eead9de02ba088306fd365dc999f860139e51987ed8ad","limit":256},"remote_execution_requested":false,"request_id":"fed-known-fixture","research":null,"synthetic_input":false}

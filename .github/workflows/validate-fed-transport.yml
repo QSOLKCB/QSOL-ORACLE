@@ -44,8 +44,10 @@ jobs:
           import json, sys
           sys.path.insert(0, 'tools')
           import fed_transport
+          from oracle_ledger import validate_ledger
           response=json.loads(open('/tmp/fed-export-1.jsonl', encoding='utf-8').read())
-          fed_transport.validate_response(response)
+          events=validate_ledger(fed_transport.LEDGER)
+          fed_transport.validate_response(response, events)
           assert response['observation']['state'] == 'known'
           assert response['observation']['authority_effect'] == 'none'
           assert response['ledger_mutated'] is False
@@ -60,3 +62,8 @@ jobs:
           PY
       - name: Run ORACLE-FED adversarial transport tests
         run: python3 -W default -m unittest discover -s tests -p 'test_fed_transport.py' -v
+      - name: Verify release fingerprint binds FED transport
+        run: |
+          python3 tools/oracle.py fingerprint > /tmp/fed-release-fingerprint.json
+          cat /tmp/fed-release-fingerprint.json
+          cmp release/fingerprint.json /tmp/fed-release-fingerprint.json

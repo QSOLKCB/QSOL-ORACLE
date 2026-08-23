@@ -124,3 +124,39 @@ Committed checkpoint and fingerprint files must match the exact repository bytes
 ## NEXUS boundary
 
 Audit only visible inputs, outputs, citations, receipts, and explicit evidence. Do not request, persist, reconstruct, or claim access to hidden chain-of-thought.
+
+## QSOL-FED transport boundary
+
+`contracts/fed-membrane.json`, `schema/fed-oracle-observation.schema.json`, `schema/fed-transport-request.schema.json`, `schema/fed-transport-response.schema.json`, `tools/fed_transport.py`, and `docs/FED.md` define the Phase 3B ORACLE↔FED live-local transport.
+
+Hard rules:
+
+- the transport is local stdio JSONL, not public networking;
+- the reviewed QSOL-FED consumer commit and observation schema are pinned and checked byte-for-byte in CI;
+- request bytes must be deterministic canonical JSON and remain within the frozen transport limits;
+- the ORACLE ledger is validated before export and is never opened for mutation by the transport;
+- `known`, `conflict`, and `unknown` must remain distinct states;
+- `known` requires at least one explicit evidence reference;
+- `conflict` requires at least two distinct explicit evidence references;
+- suggested searches remain `discovery-only` and `is_evidence = false`;
+- `synthetic_input = false` remains mandatory;
+- `evidence_promotion_requested = false`, `authority_requested = false`, and `remote_execution_requested = false` remain mandatory;
+- hidden reasoning fields remain forbidden;
+- transport hashes identify bytes and provenance only; hashes do not establish truth or authorship;
+- no response may create governance authority, votes, capabilities, citizenship, history rewrite, evidence promotion, or execution rights;
+- `oracle_holodeck_synthetic_admission` is still a separate unimplemented contract and must not be enabled as a side effect of FED transport work.
+
+```text
+OBSERVATION != TRUTH
+TRANSPORT != AUTHORITY
+HASH != ENDORSEMENT
+SUGGESTED_SEARCH != EVIDENCE
+SYNTHETIC_INPUT != ADMISSIBLE_INPUT
+```
+
+After FED transport changes run:
+
+```bash
+python3 tools/fed_transport.py validate
+python3 -W default -m unittest discover -s tests -p 'test_fed_transport.py' -v
+```

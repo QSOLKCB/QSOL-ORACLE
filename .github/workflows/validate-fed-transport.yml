@@ -1,0 +1,62 @@
+name: validate-oracle-fed-transport
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  fed-transport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout pinned QSOL-FED consumer contract
+        uses: actions/checkout@v4
+        with:
+          repository: QSOLKCB/QSOL-FED
+          ref: 407d0ed75c7d8a76bd49b3c30e74a0ae2c59f1e6
+          path: .deps/QSOL-FED
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile FED transport modules
+        run: python3 -m compileall -q tools/fed_transport.py tests/test_fed_transport.py
+      - name: Verify pinned FED observation schema byte-for-byte
+        run: cmp schema/fed-oracle-observation.schema.json .deps/QSOL-FED/schemas/oracle-observation-v1.schema.json
+      - name: Reject outbound network and process clients in transport
+        run: |
+          if grep -En 'requests|urllib\.request|http\.client|socket|subprocess' tools/fed_transport.py; then
+            echo 'outbound network/process client token found in ORACLE-FED transport'
+            exit 1
+          fi
+      - name: Validate ORACLE-FED contract
+        run: python3 tools/fed_transport.py validate
+      - name: Deterministic one-shot evidence export
+        run: |
+          python3 tools/fed_transport.py export --request fixtures/fed-known-request.jsonl > /tmp/fed-export-1.jsonl
+          python3 tools/fed_transport.py export --request fixtures/fed-known-request.jsonl > /tmp/fed-export-2.jsonl
+          cmp /tmp/fed-export-1.jsonl /tmp/fed-export-2.jsonl
+          python3 - <<'PY'
+          import json, sys
+          sys.path.insert(0, 'tools')
+          import fed_transport
+          response=json.loads(open('/tmp/fed-export-1.jsonl', encoding='utf-8').read())
+          fed_transport.validate_response(response)
+          assert response['observation']['state'] == 'known'
+          assert response['observation']['authority_effect'] == 'none'
+          assert response['ledger_mutated'] is False
+          PY
+      - name: Deterministic live JSONL stream
+        run: |
+          cat fixtures/fed-known-request.jsonl fixtures/fed-known-request.jsonl | python3 tools/fed_transport.py serve > /tmp/fed-stream.jsonl
+          python3 - <<'PY'
+          lines=open('/tmp/fed-stream.jsonl','rb').read().splitlines()
+          assert len(lines) == 2
+          assert lines[0] == lines[1]
+          PY
+      - name: Run ORACLE-FED adversarial transport tests
+        run: python3 -W default -m unittest discover -s tests -p 'test_fed_transport.py' -v

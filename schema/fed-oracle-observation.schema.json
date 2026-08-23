@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "qsol-fed-oracle-observation/1",
+  "title": "QSOL-FED ORACLE Evidence Observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "state", "evidence_refs", "suggested_searches", "synthetic_input", "truth_claim", "evidence_promotion", "authority_effect"],
+  "properties": {
+    "schema": {"const": "qsol-fed-oracle-observation/1"},
+    "state": {"enum": ["known", "conflict", "unknown"]},
+    "evidence_refs": {
+      "type": "array", "maxItems": 256, "uniqueItems": true,
+      "x-qsol-uniqueByNfcField": "reference",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["reference", "is_evidence"],
+        "properties": {
+          "reference": {"type": "string", "minLength": 1, "maxLength": 8192},
+          "is_evidence": {"type": "boolean"}
+        }
+      }
+    },
+    "suggested_searches": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["query", "purpose", "is_evidence", "admissible_as_evidence_without_observation"],
+        "properties": {
+          "query": {"type": "string", "minLength": 1, "maxLength": 8192},
+          "purpose": {"const": "discovery-only"},
+          "is_evidence": {"const": false},
+          "admissible_as_evidence_without_observation": {"const": false}
+        }
+      }
+    },
+    "synthetic_input": {"const": false},
+    "truth_claim": {"const": false},
+    "evidence_promotion": {"const": false},
+    "authority_effect": {"const": "none"}
+  },
+  "$comment": "Conflict requires at least two distinct evidence=true references after NFC normalization; the reference implementation enforces this semantic condition."
+}

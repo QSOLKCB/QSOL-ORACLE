@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "qsol-oracle-fed-response/1",
+  "title": "QSOL-ORACLE FED Evidence Export Response v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "kind",
+    "request_id",
+    "observation",
+    "total_matches",
+    "returned",
+    "truncated",
+    "source_events_sha256",
+    "ledger_mutated",
+    "transport_authority",
+    "response_sha256"
+  ],
+  "properties": {
+    "protocol": {"const": "QSOL-ORACLE-FED/1"},
+    "kind": {"const": "evidence.export.result"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "observation": {"$ref": "fed-oracle-observation.schema.json"},
+    "total_matches": {"type": "integer", "minimum": 0},
+    "returned": {"type": "integer", "minimum": 0, "maximum": 256},
+    "truncated": {"type": "boolean"},
+    "source_events_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ledger_mutated": {"const": false},
+    "transport_authority": {"const": "none"},
+    "response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
